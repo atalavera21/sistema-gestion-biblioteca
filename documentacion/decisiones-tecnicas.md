@@ -193,13 +193,13 @@ CDI (Contexts and Dependency Injection) como mecanismo de inyeccion, con Managed
 
 ```mermaid
 graph TB
-    subgraph Presentacion["Capa de Presentacion - JSF"]
+    subgraph "Capa de Presentacion - JSF"
         CatalogoBean[CatalogoBean\n@Named @SessionScoped]
         PrestamoBean[PrestamoBean\n@Named @SessionScoped]
         AuthBean[AuthBean\n@Named @SessionScoped]
     end
 
-    subgraph Negocio["Capa de Negocio - CDI"]
+    subgraph "Capa de Negocio - CDI"
         LibroService[LibroService\n@ApplicationScoped]
         PrestamoService[PrestamoService\n@ApplicationScoped]
         AuthService["<<interface>>\nAuthService"]
@@ -209,13 +209,13 @@ graph TB
         ValidadorCodigo[CodigoUniversitarioValidator\n@FacesValidator]
     end
 
-    subgraph Persistencia["Capa de Persistencia - JPA"]
+    subgraph "Capa de Persistencia - JPA"
         LibroDAO[LibroDAO]
         PrestamoDAO[PrestamoDAO]
         UsuarioDAO[UsuarioDAO]
     end
 
-    subgraph API["API REST - JAX-RS"]
+    subgraph "API REST - JAX-RS"
         DisponibilidadEndpoint[DisponibilidadResource\n@Path]
     end
 
