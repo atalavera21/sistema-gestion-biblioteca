@@ -194,19 +194,19 @@ CDI (Contexts and Dependency Injection) como mecanismo de inyeccion, con Managed
 ```mermaid
 graph TB
     subgraph "Capa de Presentacion - JSF"
-        CatalogoBean[CatalogoBean\n@Named @SessionScoped]
-        PrestamoBean[PrestamoBean\n@Named @SessionScoped]
-        AuthBean[AuthBean\n@Named @SessionScoped]
+        CatalogoBean["CatalogoBean<br/>@Named @SessionScoped"]
+        PrestamoBean["PrestamoBean<br/>@Named @SessionScoped"]
+        AuthBean["AuthBean<br/>@Named @SessionScoped"]
     end
 
     subgraph "Capa de Negocio - CDI"
-        LibroService[LibroService\n@ApplicationScoped]
-        PrestamoService[PrestamoService\n@ApplicationScoped]
-        AuthService["<<interface>>\nAuthService"]
-        LdapAuthService[LdapAuthService\n@ApplicationScoped]
-        NotificacionService[NotificacionService\n@ApplicationScoped]
-        ValidadorLibro[MaxLibrosValidator\n@FacesValidator]
-        ValidadorCodigo[CodigoUniversitarioValidator\n@FacesValidator]
+        LibroService["LibroService<br/>@ApplicationScoped"]
+        PrestamoService["PrestamoService<br/>@ApplicationScoped"]
+        AuthService["&lt;&lt;interface&gt;&gt;<br/>AuthService"]
+        LdapAuthService["LdapAuthService<br/>@ApplicationScoped"]
+        NotificacionService["NotificacionService<br/>@ApplicationScoped"]
+        ValidadorLibro["MaxLibrosValidator<br/>@FacesValidator"]
+        ValidadorCodigo["CodigoUniversitarioValidator<br/>@FacesValidator"]
     end
 
     subgraph "Capa de Persistencia - JPA"
@@ -216,8 +216,10 @@ graph TB
     end
 
     subgraph "API REST - JAX-RS"
-        DisponibilidadEndpoint[DisponibilidadResource\n@Path]
+        DisponibilidadEndpoint["DisponibilidadResource<br/>@Path"]
     end
+
+    MySQL[(MySQL<br/>libros / usuarios / prestamos<br/>+ ldap_users)]
 
     CatalogoBean -->|"@Inject"| LibroService
     PrestamoBean -->|"@Inject"| PrestamoService
@@ -232,12 +234,12 @@ graph TB
     PrestamoService -->|"@Inject"| UsuarioDAO
     PrestamoService -->|"@Inject"| NotificacionService
 
-    LibroDAO -->|"JPA"| MySQL[(MySQL)]
+    LibroDAO -->|"JPA"| MySQL
     PrestamoDAO -->|"JPA"| MySQL
     UsuarioDAO -->|"JPA"| MySQL
+    LdapAuthService -->|"JDBC (ldap_users)"| MySQL
 
     DisponibilidadEndpoint -->|"@Inject"| LibroService
-    LdapAuthService -->|"JDBC"| LDAP[(ldap_users)]
 ```
 
 ---
