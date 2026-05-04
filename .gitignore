@@ -28,3 +28,9 @@ Thumbs.db
 # Env
 .env
 *.env.local
+
+# Progreso local (no se sube a GitHub)
+PROGRESO.md
+
+# Referencia local del PDF (optimizacion para agente)
+docs/PDSD-644_REQUISITOS.md

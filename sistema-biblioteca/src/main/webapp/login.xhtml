@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:jsf="http://xmlns.jcp.org/jsf">
+<h:head>
+    <title>Iniciar Sesión — Biblioteca SENATI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+    <h:outputStylesheet library="css" name="estilos.css"/>
+</h:head>
+<h:body style="margin:0; overflow:hidden;">
+
+    <div class="login-wrapper">
+        <div class="login-card">
+
+            <div class="login-logo">
+                <div class="login-icon">📚</div>
+                <h1>Biblioteca SENATI</h1>
+                <p>Sistema de Gestión Universitaria</p>
+            </div>
+
+            <h:form id="formLogin" style="margin:0;">
+
+                <div class="login-field">
+                    <label for="formLogin:username">Usuario</label>
+                    <input jsf:id="username" type="text"
+                           jsf:value="#{authBean.username}"
+                           placeholder="U202312345@senati.pe"
+                           required="required"/>
+                </div>
+
+                <div class="login-field">
+                    <label for="formLogin:password">Contraseña</label>
+                    <input jsf:id="password" type="password"
+                           jsf:value="#{authBean.password}"
+                           placeholder="••••••••"
+                           required="required"/>
+                </div>
+
+                <h:commandButton styleClass="btn-login" value="Ingresar"
+                                 action="#{authBean.login()}"/>
+
+                <div class="login-messages">
+                    <p:messages showDetail="true" closable="true"/>
+                </div>
+            </h:form>
+
+            <a href="index.xhtml" class="login-bottom-link">
+                ← Volver al inicio
+            </a>
+
+        </div>
+    </div>
+
+</h:body>
+</html>

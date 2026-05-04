@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <title>Administración — Biblioteca SENATI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+    <h:outputStylesheet library="css" name="estilos.css"/>
+</h:head>
+<h:body>
+
+    <h:panelGroup rendered="#{not authBean.autenticado or authBean.rol != 'ADMIN'}">
+        <div class="access-denied">
+            <p>Acceso denegado.</p>
+            <p><a href="/sistema-gestion-biblioteca/login.xhtml">Iniciar sesión como administrador</a></p>
+        </div>
+    </h:panelGroup>
+
+    <h:panelGroup rendered="#{authBean.autenticado and authBean.rol == 'ADMIN'}">
+
+        <!-- ========== TOPBAR ========== -->
+        <div class="topbar">
+            <div class="topbar-brand">
+                <i class="pi pi-book"></i>
+                Biblioteca SENATI
+            </div>
+            <div class="topbar-user">
+                <span class="user-name">#{authBean.codigo}</span>
+                <h:form>
+                    <h:commandButton styleClass="btn-logout" value="Cerrar sesión"
+                                     action="#{authBean.logout()}"/>
+                </h:form>
+            </div>
+        </div>
+
+        <div class="admin-container">
+            <h1 class="page-title" style="margin-bottom:24px; color:#FFFFFF !important;">Panel de Administración</h1>
+
+            <h:form id="mensajesAdmin">
+                <p:messages showDetail="true"/>
+            </h:form>
+
+            <!-- ===== CRUD ===== -->
+            <div class="admin-card">
+                <h2 class="admin-card-header">
+                    <i class="pi pi-pencil" style="color:#C9A96E; font-size:1.2rem;"></i>
+                    #{adminBean.libroEdicion.id == null ? 'Nuevo Libro' : 'Editar Libro'}
+                </h2>
+
+                <h:form id="formLibro">
+                    <div class="crud-layout">
+
+                        <!-- Columna izquierda: Preview -->
+                        <div class="crud-preview">
+                            <div class="crud-preview-label">Vista Previa</div>
+                            <h:panelGroup id="previewPanel" layout="block">
+                                <div class="preview-card">
+                                    <div class="preview-cover">
+                                        <h:graphicImage value="#{adminBean.libroEdicion.imagen}"
+                                                        rendered="#{not empty adminBean.libroEdicion.imagen}"
+                                                        style="width:100%; height:100%; object-fit:cover;"/>
+                                        <h:panelGroup rendered="#{empty adminBean.libroEdicion.imagen}" layout="block"
+                                                       style="width:100%; height:100%; background:linear-gradient(135deg,#1B3A4B 0%,#0F2837 100%); display:flex; align-items:center; justify-content:center; font-size:4rem;">
+                                            📖
+                                        </h:panelGroup>
+                                    </div>
+                                    <div class="preview-body">
+                                        <h3>#{empty adminBean.libroEdicion.titulo ? 'Título del libro' : adminBean.libroEdicion.titulo}</h3>
+                                        <div class="autor">#{empty adminBean.libroEdicion.autor ? 'Nombre del autor' : adminBean.libroEdicion.autor}</div>
+                                        <span class="categoria">#{adminBean.libroEdicion.categoria != null ? adminBean.libroEdicion.categoria.nombre : 'CATEGORÍA'}</span>
+                                        <div class="preview-meta">
+                                            <span>#{adminBean.libroEdicion.editorial != null ? adminBean.libroEdicion.editorial : 'Editorial'}</span>
+                                            <span>#{adminBean.libroEdicion.anioPublicacion != null ? adminBean.libroEdicion.anioPublicacion : 'Año'}</span>
+                                            <span>#{adminBean.libroEdicion.paginas != null ? adminBean.libroEdicion.paginas : '---'} pág.</span>
+                                        </div>
+                                        <div class="preview-desc">
+                                            #{empty adminBean.libroEdicion.descripcion ? 'El resumen del libro aparecerá aquí...' : adminBean.libroEdicion.descripcion}
+                                        </div>
+                                    </div>
+                                    <div class="preview-footer">
+                                        <span style="font-size:0.75rem; font-weight:600; color:#1B3A4B;">
+                                            Stock: #{adminBean.libroEdicion.stockTotal > 0 ? adminBean.libroEdicion.stockTotal : '—'}
+                                        </span>
+                                        <span style="font-size:0.7rem; color:#9E9E9E; font-weight:500;">
+                                            #{empty adminBean.libroEdicion.idioma ? '—' : adminBean.libroEdicion.idioma}
+                                        </span>
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+                        </div>
+
+                        <!-- Columna derecha: Formulario -->
+                        <div class="crud-form">
+                            <div class="crud-form-section">Información del libro</div>
+
+                            <div class="admin-form-group">
+                                <p:outputLabel for="titulo" value="Título"/>
+                                <p:inputText id="titulo" value="#{adminBean.libroEdicion.titulo}" required="true"
+                                             placeholder="Ej: Introducción a la Programación">
+                                    <p:ajax event="keyup" update="previewPanel"/>
+                                </p:inputText>
+                            </div>
+
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                                <div class="admin-form-group">
+                                    <p:outputLabel for="autor" value="Autor"/>
+                                    <p:inputText id="autor" value="#{adminBean.libroEdicion.autor}" required="true"
+                                                 placeholder="Ej: Robert C. Martin">
+                                        <p:ajax event="keyup" update="previewPanel"/>
+                                    </p:inputText>
+                                </div>
+                                <div class="admin-form-group">
+                                    <p:outputLabel for="isbn" value="ISBN"/>
+                                    <p:inputText id="isbn" value="#{adminBean.libroEdicion.isbn}"
+                                                 placeholder="978-..."/>
+                                </div>
+                            </div>
+
+                            <div class="crud-form-section">Clasificación</div>
+
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                                <div class="admin-form-group">
+                                    <p:outputLabel for="categoria" value="Categoría"/>
+                                    <p:selectOneMenu id="categoria" value="#{adminBean.libroEdicion.categoria}"
+                                                     converter="categoriaConverter" style="width:100%;">
+                                        <f:selectItem itemLabel="Seleccione..." noSelectionOption="true"/>
+                                        <f:selectItems value="#{adminBean.categorias}" var="cat"
+                                                       itemLabel="#{cat.nombre}" itemValue="#{cat}"/>
+                                        <p:ajax event="change" update="previewPanel"/>
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="admin-form-group">
+                                    <p:outputLabel for="stock" value="Stock Total"/>
+                                    <p:inputText id="stock" value="#{adminBean.libroEdicion.stockTotal}" required="true"
+                                                 placeholder="Ej: 10">
+                                        <p:ajax event="keyup" update="previewPanel"/>
+                                    </p:inputText>
+                                </div>
+                            </div>
+
+                            <div class="crud-form-section">Detalles editoriales</div>
+
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                                <div class="admin-form-group">
+                                    <p:outputLabel for="editorial" value="Editorial"/>
+                                    <p:inputText id="editorial" value="#{adminBean.libroEdicion.editorial}"
+                                                 placeholder="Ej: O'Reilly Media">
+                                        <p:ajax event="keyup" update="previewPanel"/>
+                                    </p:inputText>
+                                </div>
+                                <div class="admin-form-group">
+                                    <p:outputLabel for="anio" value="Año de publicación"/>
+                                    <p:inputText id="anio" value="#{adminBean.libroEdicion.anioPublicacion}"
+                                                 placeholder="Ej: 2024">
+                                        <p:ajax event="keyup" update="previewPanel"/>
+                                    </p:inputText>
+                                </div>
+                            </div>
+
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                                <div class="admin-form-group">
+                                    <p:outputLabel for="paginas" value="Páginas"/>
+                                    <p:inputText id="paginas" value="#{adminBean.libroEdicion.paginas}"
+                                                 placeholder="Ej: 450">
+                                        <p:ajax event="keyup" update="previewPanel"/>
+                                    </p:inputText>
+                                </div>
+                                <div class="admin-form-group">
+                                    <p:outputLabel for="idioma" value="Idioma"/>
+                                    <p:inputText id="idioma" value="#{adminBean.libroEdicion.idioma}"
+                                                 placeholder="Ej: Español">
+                                        <p:ajax event="keyup" update="previewPanel"/>
+                                    </p:inputText>
+                                </div>
+                            </div>
+
+                            <div class="crud-form-section">Portada y descripción</div>
+
+                            <div class="admin-form-group">
+                                <p:outputLabel for="imagen" value="URL de la imagen"/>
+                                <p:inputText id="imagen" value="#{adminBean.libroEdicion.imagen}"
+                                             placeholder="https://... o /cover/...">
+                                    <p:ajax event="keyup" update="previewPanel"/>
+                                </p:inputText>
+                            </div>
+
+                            <div class="admin-form-group">
+                                <p:outputLabel for="descripcion" value="Resumen / Descripción"/>
+                                <p:inputTextarea id="descripcion" value="#{adminBean.libroEdicion.descripcion}"
+                                                 rows="3" placeholder="Breve descripción del libro..."
+                                                 style="resize:vertical; min-height:80px;">
+                                    <p:ajax event="keyup" update="previewPanel"/>
+                                </p:inputTextarea>
+                            </div>
+
+                            <div style="display:flex; gap:12px; margin-top:8px;">
+                                <p:commandButton value="Guardar Libro" action="#{adminBean.guardarLibro()}"
+                                                 update="tablaAdmin mensajesAdmin formLibro" styleClass="btn-primary"
+                                                 icon="pi pi-check"/>
+                                <p:commandButton value="Cancelar" action="#{adminBean.cancelarEdicion()}"
+                                                 update="formLibro" immediate="true" styleClass="btn-secondary"/>
+                            </div>
+                        </div>
+
+                    </div>
+                </h:form>
+            </div>
+
+            <!-- ===== TABLA ===== -->
+            <div class="admin-card">
+                <h2 class="admin-card-header">
+                    <i class="pi pi-list" style="color:#C9A96E; font-size:1.2rem;"></i>
+                    Libros Registrados
+                </h2>
+
+                <h:form id="tablaAdmin">
+                    <p:dataTable value="#{adminBean.listaLibros}" var="libro"
+                                 paginator="true" rows="10"
+                                 styleClass="admin-table"
+                                 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="10,25,50">
+                        <p:column headerText="Título" sortBy="#{libro.titulo}">
+                            #{libro.titulo}
+                        </p:column>
+                        <p:column headerText="Autor" sortBy="#{libro.autor}">
+                            #{libro.autor}
+                        </p:column>
+                        <p:column headerText="Categoría" sortBy="#{libro.categoria.nombre}">
+                            #{libro.categoria.nombre}
+                        </p:column>
+                        <p:column headerText="Stock" sortBy="#{libro.stockTotal}">
+                            #{libro.stockTotal}
+                        </p:column>
+                        <p:column headerText="Acciones">
+                            <div class="col-actions">
+                                <p:commandButton value="Editar" action="#{adminBean.editarLibro(libro)}"
+                                                 update="formLibro mensajesAdmin" styleClass="btn-edit"/>
+                                <p:commandButton value="Eliminar" action="#{adminBean.eliminarLibro(libro.id)}"
+                                                 update="tablaAdmin mensajesAdmin" styleClass="btn-danger"
+                                                 onclick="return confirm('¿Eliminar este libro?')"/>
+                            </div>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+            </div>
+
+            <!-- ===== DEVOLUCIONES ===== -->
+            <div class="admin-card">
+                <h2 class="admin-card-header">
+                    <i class="pi pi-undo" style="color:#C9A96E; font-size:1.2rem;"></i>
+                    Devoluciones Pendientes
+                </h2>
+
+                <h:form id="formDevoluciones">
+                    <p:dataTable value="#{adminBean.prestamosVencidos}" var="p"
+                                 emptyMessage="No hay préstamos vencidos."
+                                 styleClass="admin-table">
+                        <p:column headerText="Libro">
+                            #{p.libro.titulo}
+                        </p:column>
+                        <p:column headerText="Usuario">
+                            #{p.usuario.nombre}
+                        </p:column>
+                        <p:column headerText="Vencía">
+                            #{p.fechaDevolucionEstimada}
+                        </p:column>
+                        <p:column headerText="Acción">
+                            <p:commandButton value="Registrar Devolución"
+                                             action="#{adminBean.registrarDevolucion()}"
+                                             update="formDevoluciones tablaAdmin mensajesAdmin"
+                                             styleClass="btn-primary"
+                                             icon="pi pi-check">
+                                <f:setPropertyActionListener value="#{p.id}" target="#{adminBean.prestamoIdDevolucion}"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+            </div>
+
+            <div style="text-align:center; margin: 24px 0 48px;">
+                <a href="/sistema-gestion-biblioteca/index.xhtml" class="btn-ghost">← Volver al inicio</a>
+            </div>
+
+        </div>
+
+    </h:panelGroup>
+
+</h:body>
+</html>

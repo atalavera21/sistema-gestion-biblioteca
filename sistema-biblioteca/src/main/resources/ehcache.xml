@@ -1,0 +1,30 @@
+<config xmlns="http://www.ehcache.org/v3"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.ehcache.org/v3
+                             https://www.ehcache.org/schema/ehcache-core-3.0.xsd">
+
+    <!-- Cache por defecto -->
+    <cache alias="defaultCache">
+        <key-type>java.lang.Object</key-type>
+        <value-type>java.lang.Object</value-type>
+        <expiry>
+            <ttl unit="minutes">30</ttl>
+        </expiry>
+        <resources>
+            <heap unit="entries">1000</heap>
+        </resources>
+    </cache>
+
+    <!-- Cache para la entidad Libro (datos de lectura frecuente) -->
+    <cache alias="com.senati.biblioteca.modelo.Libro">
+        <key-type>java.lang.Long</key-type>
+        <value-type>java.lang.Object</value-type>
+        <expiry>
+            <ttl unit="minutes">15</ttl>
+        </expiry>
+        <resources>
+            <heap unit="entries">500</heap>
+        </resources>
+    </cache>
+
+</config>

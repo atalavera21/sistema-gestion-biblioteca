@@ -1,0 +1,1577 @@
+/* ============================================================
+   SISTEMA DE GESTIÓN DE BIBLIOTECA UNIVERSITARIA — SENATI
+   Guía de Diseño v1.0 — Tokens + Estilos Globales
+   ============================================================ */
+
+/* ---------- Google Fonts ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap');
+
+/* ============================================================
+   1. TOKENS DE DISEÑO (Variables CSS)
+   ============================================================ */
+:root {
+  /* --- Paleta Principal --- */
+  --color-primary:            #1B3A4B;
+  --color-primary-hover:      #15303E;
+  --color-primary-light:      #E8F0F4;
+  --color-secondary:          #C9A96E;
+  --color-secondary-light:    #F5EFE1;
+
+  /* --- Superficies --- */
+  --color-surface:            #FFFFFF;
+  --color-background:         #F5F3EF;
+  --color-sidebar:            #0F2837;
+
+  /* --- Texto --- */
+  --color-text-primary:       #1A1A1A;
+  --color-text-secondary:     #5C5C5C;
+  --color-text-muted:         #9E9E9E;
+  --color-text-on-dark:       #FFFFFF;
+
+  /* --- Semánticos --- */
+  --color-success:            #2D6A4F;
+  --color-success-bg:         #E8F5E9;
+  --color-warning:            #B8860B;
+  --color-warning-bg:         #FFF3CD;
+  --color-danger:             #A42834;
+  --color-danger-bg:          #FDE8E8;
+  --color-info:               #1B6B93;
+  --color-info-bg:            #E3F2FD;
+
+  /* --- Espaciado (múltiplos de 4px) --- */
+  --space-xs:    4px;
+  --space-sm:    8px;
+  --space-md:    16px;
+  --space-lg:    24px;
+  --space-xl:    32px;
+  --space-2xl:   48px;
+
+  /* --- Bordes --- */
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   16px;
+
+  /* --- Sombras --- */
+  --shadow-card:        0 2px 8px rgba(0,0,0,0.06);
+  --shadow-card-hover:  0 4px 16px rgba(0,0,0,0.10);
+  --shadow-nav:         0 2px 12px rgba(0,0,0,0.08);
+
+  /* --- Tipografía --- */
+  --font-ui:      'Inter', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Playfair Display', Georgia, serif;
+}
+
+/* ============================================================
+   2. RESET + BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #1A1A1A !important;
+  background: linear-gradient(135deg, #1B3A4B 0%, #0F2837 100%) !important;
+  background-attachment: fixed !important;
+  min-height: 100vh;
+}
+
+/* ============================================================
+   3. TIPOGRAFÍA
+   ============================================================ */
+.page-title {
+  font-family: 'Playfair Display', Georgia, serif !important;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1B3A4B !important;
+  line-height: 1.2;
+}
+
+.section-title {
+  font-family: 'Playfair Display', Georgia, serif !important;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1B3A4B !important;
+  line-height: 1.3;
+}
+
+/* ============================================================
+    4. LOGIN PAGE
+   ============================================================ */
+.login-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1B3A4B 0%, #0F2837 100%);
+  padding: var(--space-lg);
+}
+
+.login-card {
+  background: #FFFFFF !important;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+  width: 100%;
+  max-width: 440px;
+  padding: 44px 36px;
+}
+
+.login-logo {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.login-logo .login-icon {
+  font-size: 3rem;
+  margin-bottom: 4px;
+}
+
+.login-logo h1 {
+  font-family: 'Playfair Display', Georgia, serif !important;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1B3A4B;
+  margin: 0 0 4px 0;
+}
+
+.login-logo p {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.875rem;
+  color: #5C5C5C;
+  margin: 0;
+}
+
+.login-field {
+  margin-bottom: 16px;
+}
+
+.login-field label {
+  display: block;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #1A1A1A;
+  margin-bottom: 6px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.login-field input {
+  width: 100%;
+  height: 44px;
+  border: 1.5px solid #D0D0D0 !important;
+  border-radius: 8px;
+  padding: 0 14px;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.938rem;
+  color: #1A1A1A;
+  background: #FFFFFF !important;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+  box-shadow: none !important;
+}
+
+.login-field input:focus {
+  outline: none;
+  border-color: #1B3A4B !important;
+  box-shadow: 0 0 0 3px rgba(27,58,75,0.12) !important;
+}
+
+.login-field input::placeholder {
+  color: #9E9E9E;
+}
+
+.btn-login {
+  width: 100% !important;
+  height: 44px !important;
+  background: #1B3A4B !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.938rem !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 150ms ease;
+  padding: 0 !important;
+  text-shadow: none !important;
+}
+
+.btn-login:hover {
+  background: #15303E !important;
+}
+
+.login-bottom-link {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  color: #5C5C5C;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.8125rem;
+  text-decoration: none;
+}
+
+.login-bottom-link:hover {
+  color: #1B3A4B;
+}
+
+.login-messages {
+  margin-top: 16px;
+  font-size: 0.8125rem;
+}
+
+/* ============================================================
+    5. PÁGINA DE INICIO (Hero)
+   ============================================================ */
+.hero-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1B3A4B 0%, #0F2837 100%);
+  padding: 24px;
+}
+
+.hero-card {
+  text-align: center;
+  max-width: 520px;
+  width: 100%;
+}
+
+.hero-icon {
+  font-size: 4rem;
+  margin-bottom: 8px;
+}
+
+.hero-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin: 0 0 4px 0;
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  color: #C9A96E;
+  margin: 0 0 20px 0;
+}
+
+.hero-desc {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.938rem;
+  color: rgba(255,255,255,0.70);
+  line-height: 1.6;
+  margin: 0 0 32px 0;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.hero-btn {
+  display: inline-block;
+  height: 44px;
+  line-height: 44px;
+  padding: 0 28px;
+  border-radius: 8px;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.938rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 150ms ease, transform 150ms ease;
+}
+
+.hero-btn-primary {
+  background: #C9A96E;
+  color: #1B3A4B;
+}
+
+.hero-btn-primary:hover {
+  background: #D4B87A;
+  transform: translateY(-1px);
+}
+
+.hero-btn-secondary {
+  background: rgba(255,255,255,0.12);
+  color: #FFFFFF;
+  border: 1.5px solid rgba(255,255,255,0.25);
+}
+
+.hero-btn-secondary:hover {
+  background: rgba(255,255,255,0.20);
+  transform: translateY(-1px);
+}
+
+.hero-footer {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.40);
+  margin-top: 36px;
+}
+
+/* ============================================================
+    6. TOPBAR (Barra de navegación superior)
+   ============================================================ */
+.topbar {
+  background: rgba(15, 40, 55, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.15);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.topbar-brand {
+  font-family: 'Playfair Display', Georgia, serif !important;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.topbar-brand i { color: #C9A96E; font-size: 1.25rem; }
+
+.topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #FFFFFF;
+  font-size: 0.875rem;
+}
+
+.topbar-user .user-name {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-weight: 500;
+}
+
+.btn-logout {
+  background: #A42834 !important;
+  color: white !important;
+  border: none !important;
+  padding: 6px 16px !important;
+  border-radius: 6px !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.8125rem !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+  text-shadow: none !important;
+}
+
+.btn-logout:hover { opacity: 0.85 !important; }
+
+/* ============================================================
+    7. CATÁLOGO — Sidebar + Grid
+   ============================================================ */
+.catalogo-layout {
+  display: flex;
+  min-height: calc(100vh - 60px);
+}
+
+/* Sidebar */
+.catalogo-sidebar {
+  width: 260px;
+  min-width: 260px;
+  background: rgba(15, 40, 55, 0.50);
+  backdrop-filter: blur(8px);
+  border-right: 1px solid rgba(255,255,255,0.06);
+  padding: 24px 0;
+  overflow-y: auto;
+  position: sticky;
+  top: 60px;
+  height: calc(100vh - 60px);
+}
+
+.sidebar-section {
+  padding: 0 20px 20px 20px;
+}
+
+.sidebar-section + .sidebar-section {
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding-top: 20px;
+}
+
+.sidebar-title {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.40);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin: 0 0 12px 0;
+}
+
+.sidebar-search {
+  width: 100% !important;
+  height: 38px !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  border-radius: 8px !important;
+  background: rgba(255,255,255,0.08) !important;
+  color: #FFFFFF !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.8125rem !important;
+  padding: 0 14px !important;
+  box-shadow: none !important;
+}
+
+.sidebar-search::placeholder {
+  color: rgba(255,255,255,0.30) !important;
+}
+
+.sidebar-search:focus {
+  border-color: rgba(255,255,255,0.30) !important;
+  background: rgba(255,255,255,0.12) !important;
+  box-shadow: none !important;
+}
+
+.sidebar-cat-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar-cat-list li {
+  margin: 0;
+}
+
+.sidebar-cat-link {
+  display: block;
+  padding: 8px 20px;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.60) !important;
+  text-decoration: none !important;
+  transition: all 150ms ease;
+  border-left: 3px solid transparent;
+}
+
+.sidebar-cat-link:hover {
+  color: #FFFFFF !important;
+  background: rgba(255,255,255,0.05);
+}
+
+.sidebar-cat-link.sidebar-cat-active {
+  color: #C9A96E !important;
+  background: rgba(201,169,110,0.10);
+  border-left-color: #C9A96E;
+  font-weight: 600;
+}
+
+/* Contenido principal */
+.catalogo-main {
+  flex: 1;
+  padding: 32px;
+  overflow-y: auto;
+}
+
+.catalogo-header {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.catalogo-count {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.8125rem;
+  color: rgba(255,255,255,0.40);
+  white-space: nowrap;
+}
+
+/* Grid de libros */
+.libros-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 24px;
+}
+
+.libro-card {
+  background: #FFFFFF !important;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  overflow: hidden;
+  transition: transform 250ms ease, box-shadow 250ms ease;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.libro-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+}
+
+/* Portada */
+.libro-card .card-cover {
+  height: 220px;
+  background: linear-gradient(135deg, #1B3A4B 0%, #15303E 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Badge de categoría flotante sobre la portada */
+.libro-card .card-cover-badge {
+  position: absolute;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  padding: 4px 10px;
+  border-radius: 5px;
+  z-index: 2;
+  color: #FFFFFF;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(6px);
+}
+
+.card-cover-badge.cat-badge {
+  bottom: 12px;
+  left: 12px;
+}
+
+.card-cover-badge.disp-badge {
+  top: 12px;
+  right: 12px;
+}
+
+.card-cover-badge.disponible {
+  background: rgba(5, 150, 105, 0.85) !important;
+}
+
+.card-cover-badge.agotado {
+  background: rgba(220, 38, 38, 0.85) !important;
+}
+
+/* Cuerpo */
+.libro-card .card-body {
+  padding: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.libro-card .card-body h3 {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #1A1A1A;
+  line-height: 1.35;
+  margin-bottom: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.libro-card .card-body .autor {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.8125rem;
+  color: #6B7280;
+  font-weight: 500;
+}
+
+/* Footer con botones proporcionados */
+.libro-card .card-footer {
+  padding: 12px 16px;
+  border-top: 1px solid #F0F0F0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: #FAFBFC;
+}
+
+.card-btn {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  padding: 7px 18px !important;
+  border-radius: 6px !important;
+  cursor: pointer;
+  text-decoration: none !important;
+  text-shadow: none !important;
+  transition: all 150ms ease !important;
+  line-height: 1.3 !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  flex: 1;
+  max-width: 130px;
+}
+
+.card-btn-outline {
+  background: transparent !important;
+  color: #1B3A4B !important;
+  border: 1.5px solid #1B3A4B !important;
+}
+
+.card-btn-outline:hover {
+  background: #E8F0F4 !important;
+}
+
+.card-btn-solid {
+  background: #1B3A4B !important;
+  color: #FFFFFF !important;
+  border: 1.5px solid #1B3A4B !important;
+}
+
+.card-btn-solid:hover {
+  background: #0F2837 !important;
+  border-color: #0F2837 !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .catalogo-layout { flex-direction: column; }
+  .catalogo-sidebar {
+    width: 100%;
+    min-width: 100%;
+    position: static;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 16px;
+  }
+  .catalogo-main { padding: 20px; }
+}
+
+/* ============================================================
+    8. ADMIN — Panel de Administración
+   ============================================================ */
+.admin-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.admin-card {
+  background: #FFFFFF !important;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.06);
+  padding: 28px;
+  margin-bottom: 24px;
+  border-left: 4px solid #C9A96E;
+}
+
+.admin-card-header {
+  font-family: 'Playfair Display', Georgia, serif !important;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1B3A4B;
+  margin: 0 0 24px 0;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #E8F0F4;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Form fields */
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 24px;
+}
+
+.admin-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.admin-form-group label {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #1B3A4B;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.admin-form-group input,
+.admin-form-group select {
+  height: 44px;
+  border: 2px solid #E0E0E0 !important;
+  border-radius: 8px;
+  padding: 0 16px;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.938rem;
+  color: #1A1A1A;
+  background: #FAFBFC !important;
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.admin-form-group input:focus,
+.admin-form-group select:focus {
+  outline: none;
+  border-color: #1B3A4B !important;
+  box-shadow: 0 0 0 4px rgba(27,58,75,0.08) !important;
+  background: #FFFFFF !important;
+}
+
+.admin-form-group input:hover {
+  border-color: #C0C0C0 !important;
+}
+
+/* PrimeFaces inputs en el admin */
+.admin-card .ui-inputfield {
+  height: 44px !important;
+  border: 2px solid #E0E0E0 !important;
+  border-radius: 8px !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.938rem !important;
+  color: #1A1A1A !important;
+  background: #FAFBFC !important;
+  box-shadow: none !important;
+  padding: 0 16px !important;
+  transition: border-color 200ms ease, box-shadow 200ms ease !important;
+}
+
+.admin-card .ui-inputfield:focus {
+  border-color: #1B3A4B !important;
+  box-shadow: 0 0 0 4px rgba(27,58,75,0.08) !important;
+  background: #FFFFFF !important;
+}
+
+.admin-card .ui-inputfield:hover {
+  border-color: #C0C0C0 !important;
+}
+
+/* inputTextarea */
+.admin-card .ui-inputtextarea {
+  border: 2px solid #E0E0E0 !important;
+  border-radius: 8px !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.938rem !important;
+  color: #1A1A1A !important;
+  background: #FAFBFC !important;
+  box-shadow: none !important;
+  padding: 12px 16px !important;
+  transition: border-color 200ms ease, box-shadow 200ms ease !important;
+  min-height: 80px !important;
+}
+
+.admin-card .ui-inputtextarea:focus {
+  border-color: #1B3A4B !important;
+  box-shadow: 0 0 0 4px rgba(27,58,75,0.08) !important;
+  background: #FFFFFF !important;
+}
+
+.admin-card .ui-inputtextarea:hover {
+  border-color: #C0C0C0 !important;
+}
+
+/* selectOneMenu — solo borde exterior, no layout interno */
+.admin-card .ui-selectonemenu {
+  border: 2px solid #E0E0E0 !important;
+  border-radius: 8px !important;
+  background: #FAFBFC !important;
+  box-shadow: none !important;
+  min-width: 100% !important;
+}
+
+.admin-card .ui-selectonemenu.ui-state-focus,
+.admin-card .ui-selectonemenu.ui-state-hover {
+  border-color: #1B3A4B !important;
+  box-shadow: 0 0 0 4px rgba(27,58,75,0.08) !important;
+}
+
+.admin-card .ui-selectonemenu .ui-selectonemenu-label {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.938rem !important;
+  color: #1A1A1A !important;
+  background: transparent !important;
+  padding-left: 16px !important;
+}
+
+.admin-card .ui-selectonemenu .ui-selectonemenu-trigger {
+  background: transparent !important;
+  border: none !important;
+  border-left: 1px solid #E0E0E0 !important;
+  width: 36px !important;
+}
+
+/* Flecha del dropdown visible */
+.admin-card .ui-selectonemenu .ui-selectonemenu-trigger .ui-icon {
+  color: #5C5C5C !important;
+  font-size: 0.9rem !important;
+}
+
+.admin-card .ui-selectonemenu .ui-selectonemenu-trigger .ui-icon-triangle-1-s {
+  margin-top: 0 !important;
+  background-image: none !important;
+}
+
+.admin-card .ui-selectonemenu .ui-selectonemenu-trigger .ui-icon:before {
+  content: "▼" !important;
+  font-size: 0.55rem !important;
+  color: #5C5C5C !important;
+}
+
+.admin-card .ui-selectonemenu-panel {
+  border-radius: 8px !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.18) !important;
+  border: 1px solid #E0E0E0 !important;
+  background: #FFFFFF !important;
+}
+
+.admin-card .ui-selectonemenu-list-item {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.875rem !important;
+  padding: 10px 16px !important;
+  color: #1A1A1A !important;
+}
+
+.admin-card .ui-selectonemenu-list-item.ui-state-highlight {
+  background: #E8F0F4 !important;
+  color: #1B3A4B !important;
+}
+
+/* Botones del admin */
+.btn-primary {
+  height: 44px !important;
+  background: linear-gradient(135deg, #1B3A4B 0%, #0F2837 100%) !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+  padding: 0 24px !important;
+  cursor: pointer;
+  text-shadow: none !important;
+  box-shadow: 0 2px 8px rgba(27,58,75,0.25) !important;
+  transition: transform 150ms ease, box-shadow 150ms ease !important;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(27,58,75,0.35) !important;
+}
+
+.btn-secondary {
+  height: 44px !important;
+  background: transparent !important;
+  color: #5C5C5C !important;
+  border: 2px solid #E0E0E0 !important;
+  border-radius: 8px !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  padding: 0 24px !important;
+  cursor: pointer;
+  text-shadow: none !important;
+  transition: border-color 150ms ease, color 150ms ease !important;
+}
+
+.btn-secondary:hover {
+  border-color: #1B3A4B !important;
+  color: #1B3A4B !important;
+}
+
+.btn-danger {
+  height: 34px !important;
+  background: #A42834 !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  border-radius: 6px !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  padding: 0 16px !important;
+  cursor: pointer;
+  text-shadow: none !important;
+  box-shadow: 0 2px 6px rgba(164,40,52,0.2) !important;
+  transition: opacity 150ms ease !important;
+}
+
+.btn-danger:hover { opacity: 0.85 !important; }
+
+.btn-edit {
+  height: 34px !important;
+  background: #C9A96E !important;
+  color: #1B3A4B !important;
+  border: none !important;
+  border-radius: 6px !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  padding: 0 16px !important;
+  cursor: pointer;
+  text-shadow: none !important;
+  box-shadow: 0 2px 6px rgba(201,169,110,0.3) !important;
+  transition: transform 150ms ease !important;
+}
+
+.btn-edit:hover { transform: translateY(-1px); }
+
+.btn-ghost {
+  display: inline-block;
+  height: 40px;
+  line-height: 40px;
+  color: rgba(255,255,255,0.7) !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+.btn-ghost:hover { color: #FFFFFF !important; }
+
+/* ============================================================
+    9. DETALLE DE LIBRO
+   ============================================================ */
+.detalle-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+.detalle-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.detalle-cover-col {
+  position: sticky;
+  top: 84px;
+}
+
+.detalle-cover {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  min-height: 400px;
+}
+
+.detalle-info-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.detalle-categoria-badge {
+  display: inline-block;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #C9A96E;
+  background: rgba(201,169,110,0.12);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  width: fit-content;
+}
+
+.detalle-titulo {
+  font-family: 'Playfair Display', Georgia, serif !important;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #FFFFFF !important;
+  line-height: 1.2;
+  margin: 0 0 8px 0;
+}
+
+.detalle-autor {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 1.0625rem;
+  color: rgba(255,255,255,0.70);
+  margin: 0 0 28px 0;
+}
+
+.detalle-autor strong {
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+.detalle-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 0;
+}
+
+.detalle-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meta-label {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.40);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.meta-value {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.9375rem;
+  color: #FFFFFF;
+  font-weight: 500;
+}
+
+.detalle-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.10);
+  margin: 28px 0;
+}
+
+.detalle-descripcion h3 {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #C9A96E;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0 0 12px 0;
+}
+
+.detalle-descripcion p {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.75);
+  margin: 0;
+}
+
+.detalle-acciones {
+  margin-top: 28px;
+  display: flex;
+  gap: 12px;
+}
+
+.detalle-btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 8px;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.15);
+  text-decoration: none;
+  transition: background 150ms ease;
+}
+
+.detalle-btn-back:hover {
+  background: rgba(255,255,255,0.18);
+}
+
+@media (max-width: 768px) {
+  .detalle-grid {
+    grid-template-columns: 1fr;
+  }
+  .detalle-cover-col {
+    position: static;
+    max-width: 260px;
+    margin: 0 auto;
+  }
+  .detalle-meta-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ============================================================
+    10. BOTON "VER MÁS" EN CATALOGO
+   ============================================================ */
+.btn-vermas {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 6px;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #FFFFFF !important;
+  background: #1B3A4B !important;
+  border: none !important;
+  text-decoration: none !important;
+  transition: all 150ms ease;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+}
+
+.btn-vermas:hover {
+  background: #0F2837 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* ============================================================
+    11. MODAL DETALLE DE LIBRO
+   ============================================================ */
+/* Backdrop: blur y oscurecido */
+.ui-widget-overlay {
+  background: rgba(0,0,0,0.55) !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* Modal completo: fondo blanco */
+.modal-detalle,
+.modal-detalle .ui-dialog,
+.modal-detalle.ui-dialog {
+  background: #FFFFFF !important;
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3) !important;
+  border: none !important;
+}
+
+.modal-detalle .ui-dialog-titlebar {
+  background: #1B3A4B !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  padding: 16px 24px !important;
+  font-family: 'Playfair Display', Georgia, serif !important;
+  font-size: 1.125rem !important;
+  font-weight: 600 !important;
+  text-shadow: none !important;
+}
+
+.modal-detalle .ui-dialog-titlebar .ui-dialog-titlebar-icon {
+  color: rgba(255,255,255,0.7) !important;
+  background: none !important;
+  border: none !important;
+}
+
+.modal-detalle .ui-dialog-titlebar .ui-dialog-titlebar-icon:hover {
+  color: #FFFFFF !important;
+  background: rgba(255,255,255,0.1) !important;
+  border-radius: 6px !important;
+}
+
+.modal-detalle .ui-dialog-content {
+  padding: 0 !important;
+  background: #FFFFFF !important;
+  color: #1A1A1A !important;
+  border: none !important;
+  overflow: hidden !important;
+}
+
+.modal-detalle-grid {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 0;
+  min-height: 380px;
+  background: #FFFFFF !important;
+}
+
+.modal-detalle-cover {
+  background: #F8F7F4 !important;
+  padding: 20px;
+  display: flex;
+  align-items: flex-start;
+  min-height: 100%;
+}
+
+.modal-detalle-cover img {
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+.modal-detalle-info {
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  background: #FFFFFF !important;
+}
+
+.modal-categoria-badge {
+  display: inline-block;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #1B3A4B !important;
+  background: #E8F0F4 !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 4px 10px;
+  border-radius: 5px;
+  width: fit-content;
+  margin-bottom: 12px;
+}
+
+.modal-titulo {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1A1A1A !important;
+  line-height: 1.3;
+  margin: 0 0 4px 0;
+}
+
+.modal-autor {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.875rem;
+  color: #5C5C5C !important;
+  margin: 0 0 20px 0;
+}
+
+.modal-autor strong { color: #1A1A1A !important; font-weight: 600; }
+
+.modal-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px 16px;
+}
+
+.modal-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.modal-meta-item .meta-label {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: #9E9E9E !important;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.modal-meta-item .meta-value {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.875rem;
+  color: #1A1A1A !important;
+  font-weight: 500;
+}
+
+.modal-divider {
+  height: 1px;
+  background: #EEEEEE !important;
+  margin: 18px 0;
+}
+
+.modal-descripcion {
+  background: #FFFFFF !important;
+}
+
+.modal-descripcion h4 {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #1B3A4B !important;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin: 0 0 8px 0;
+  background: #FFFFFF !important;
+}
+
+.modal-descripcion p {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: #3A3A3A !important;
+  margin: 0;
+  background: #FFFFFF !important;
+}
+
+/* Fix para que el comando "Ver más" se vea como boton */
+.btn-vermas.ui-link {
+  text-decoration: none !important;
+  background: #1B3A4B !important;
+}
+
+/* ============================================================
+    12. TABLA DEL ADMIN
+   ============================================================ */
+.admin-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  background: #FFFFFF !important;
+}
+
+.admin-table th,
+.admin-table thead th,
+.admin-table .ui-datatable-thead th,
+.admin-table tr.ui-state-default,
+.admin-table .ui-state-default {
+  background: #1B3A4B !important;
+  color: #FFFFFF !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.6875rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  padding: 10px 16px !important;
+  text-align: left !important;
+  border: none !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+
+.admin-table td,
+.admin-table tbody td,
+.admin-table .ui-datatable-data td {
+  padding: 10px 16px !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.875rem !important;
+  color: #1A1A1A !important;
+  border-bottom: 1px solid #EAEAEA !important;
+  background: #FFFFFF !important;
+}
+
+.admin-table tbody tr:nth-child(even) td,
+.admin-table .ui-datatable-data tr:nth-child(even) td {
+  background: #F5F3EF !important;
+}
+
+.admin-table tbody tr:hover td,
+.admin-table .ui-datatable-data tr:hover td {
+  background: #F5EFE1 !important;
+}
+
+.admin-table .col-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Ocultar bordes y fondos del tema arya en la tabla admin */
+.admin-table.ui-datatable,
+.admin-card .ui-datatable,
+.admin-card .ui-datatable table {
+  background: #FFFFFF !important;
+  border: none !important;
+}
+
+.admin-card .ui-datatable .ui-datatable-header,
+.admin-card .ui-datatable .ui-datatable-footer {
+  background: #FFFFFF !important;
+  border: none !important;
+}
+
+.admin-card .ui-paginator {
+  background: #FFFFFF !important;
+  border: none !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+}
+
+/* Layout CRUD: 2 columnas (preview + form) */
+.crud-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 36px;
+  align-items: start;
+}
+
+.crud-preview {
+  position: sticky;
+  top: 84px;
+}
+
+.crud-preview-label {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #C9A96E;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.preview-card {
+  background: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+.preview-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 36px rgba(0,0,0,0.18), 0 4px 12px rgba(0,0,0,0.10);
+}
+
+.preview-cover {
+  height: 240px;
+  background: linear-gradient(135deg, #E8F0F4 0%, #F5EFE1 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.preview-body {
+  padding: 18px;
+  flex: 1;
+}
+
+.preview-body h3 {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1A1A1A;
+  line-height: 1.3;
+  margin-bottom: 6px;
+  min-height: 1.4em;
+}
+
+.preview-body .autor {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.8125rem;
+  color: #5C5C5C;
+  margin-bottom: 8px;
+  min-height: 1.2em;
+}
+
+.preview-body .categoria {
+  display: inline-block;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  background: #1B3A4B;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  min-height: auto;
+}
+
+.preview-meta {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.6875rem;
+  color: #9E9E9E;
+}
+
+.preview-meta span {
+  white-space: nowrap;
+}
+
+.preview-desc {
+  margin-top: 10px;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.75rem;
+  color: #5C5C5C;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.preview-footer {
+  padding: 10px 18px;
+  border-top: 1px solid #F0F0F0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #FAFBFC;
+}
+
+/* Columna del formulario */
+.crud-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Etiqueta de seccion en form */
+.crud-form-section {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #1B3A4B;
+  border-bottom: 2px solid #E8F0F4;
+  padding-bottom: 8px;
+  margin-bottom: 4px;
+}
+
+/* Responsive para CRUD */
+@media (max-width: 900px) {
+  .crud-layout {
+    grid-template-columns: 1fr;
+  }
+  .crud-preview {
+    position: static;
+    max-width: 340px;
+    margin: 0 auto;
+  }
+}
+
+/* Badge de acceso denegado */
+.access-denied {
+  text-align: center;
+  padding: 80px 24px;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  color: #5C5C5C;
+}
+
+.access-denied a {
+  color: #1B3A4B;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.access-denied a:hover { text-decoration: underline; }
+
+/* ============================================================
+    9. UTILIDADES
+   ============================================================ */
+.text-center { text-align: center; }
+.mt-sm { margin-top: var(--space-sm); }
+.mt-md { margin-top: var(--space-md); }
+.mt-lg { margin-top: var(--space-lg); }
+.mb-md { margin-bottom: var(--space-md); }
+.empty-state {
+  text-align: center;
+  padding: var(--space-2xl);
+  color: var(--color-text-muted);
+}
+.empty-state i { font-size: 3rem; display: block; margin-bottom: var(--space-md); }

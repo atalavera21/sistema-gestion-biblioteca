@@ -22,13 +22,14 @@ AGENTS.md  →  README.md  →  documentacion/
 | 3 | `documentacion/casos-de-uso.md` | 3 actores + 10 casos de uso + 10 reglas de negocio + 2 validadores |
 | 3 | `documentacion/stack-tecnologico.md` | Versiones, dependencias Maven, configuraciones |
 | 3 | `documentacion/preguntas-guia.md` | Respuestas a las 5 preguntas del PDF con codigo de ejemplo |
+| 3 | `documentacion/guia-de-diseno.md` | Paleta de colores, tipografia, espaciado, layout, componentes, accesibilidad |
 
 ## Contexto del estudiante
 
 - Viene de .NET, nuevo en Java. Necesita acompanamiento en el aprendizaje.
 - No tiene herramientas Java instaladas aun.
-- Fase actual: **diseno completado**. Diagramas C4, ADRs, casos de uso, stack tecnologico y README ya estan documentados.
-- Siguiente fase: instalar herramientas Java → codificar.
+- Fase actual: **codificacion en progreso. App funcionando en WildFly 35.**
+- Siguiente fase: implementar roles (Admin vs Estudiante), refactorizar Categoria como entidad.
 
 ## Estructura del proyecto
 
@@ -36,17 +37,39 @@ AGENTS.md  →  README.md  →  documentacion/
 senati/
 ├── README.md                          ← presentacion del proyecto (corto, profesional, narrativo)
 ├── AGENTS.md                          ← este archivo (contexto para agentes IA)
+├── PROGRESO.md                        ← bitacora de avance (solo local, no se sube a GitHub)
 ├── docs/
 │   └── PDSD-644_TRABAJOFINAL.pdf      ← enunciado original del curso
-└── documentacion/
-    ├── decisiones-tecnicas.md          ← 10 ADRs + 4 diagramas C4 en Mermaid + seccion JPQL
-    ├── casos-de-uso.md                 ← 3 actores + 10 casos de uso + 10 reglas de negocio + 2 validadores
-    ├── stack-tecnologico.md            ← versiones exactas, deps Maven, configs (persistence.xml, ehcache.xml)
-    └── preguntas-guia.md               ← respuestas a las 5 preguntas del PDF con codigo de ejemplo
+├── documentacion/
+│   ├── decisiones-tecnicas.md          ← 10 ADRs + 4 diagramas C4 en Mermaid + seccion JPQL
+│   ├── casos-de-uso.md                 ← 3 actores + 10 casos de uso + 10 reglas de negocio + 2 validadores
+│   ├── stack-tecnologico.md            ← versiones exactas, deps Maven, configs (persistence.xml, ehcache.xml)
+│   └── preguntas-guia.md               ← respuestas a las 5 preguntas del PDF con codigo de ejemplo
+└── sistema-biblioteca/                ← proyecto Maven (equivalente a un .csproj en .NET)
+    ├── pom.xml                        ← = .csproj + packages.config
+    ├── src/
+    │   ├── main/java/com/senati/biblioteca/
+    │   │   ├── modelo/                ← entidades JPA
+    │   │   ├── dao/                   ← acceso a datos
+    │   │   ├── servicio/              ← logica de negocio
+    │   │   ├── bean/                  ← managed beans JSF
+    │   │   └── rest/                  ← API REST
+    │   ├── main/resources/
+    │   │   ├── META-INF/persistence.xml
+    │   │   ├── ehcache.xml
+    │   │   └── logback.xml
+    │   ├── main/webapp/WEB-INF/
+    │   │   ├── web.xml
+    │   │   ├── beans.xml
+    │   │   └── faces-config.xml
+    │   └── test/
+    └── target/                        ← build output (no se commitea)
+        └── sistema-gestion-biblioteca.war
 ```
 
 - `docs/` = materiales del curso (PDF, anuncios, etc.)
 - `documentacion/` = documentacion propia del proyecto.
+- `sistema-biblioteca/` = codigo fuente. Todos los comandos Maven se ejecutan desde esta carpeta.
 
 ## Stack obligatorio (definido por el curso)
 
@@ -61,16 +84,16 @@ senati/
 
 ## Stack completo (detallado en `documentacion/stack-tecnologico.md`)
 
-- **Java 17 LTS** (Eclipse Temurin)
-- **WildFly 27+** (servidor de aplicaciones Jakarta EE)
-- **Maven 3.9+** (build tool)
-- **JSF 4.0 + Facelets** (presentacion) + PrimeFaces 13+ (opcional)
+- **Java 21 LTS** (Eclipse Temurin) — se usa 21 por compatibilidad con WildFly 35
+- **WildFly 35** (servidor de aplicaciones Jakarta EE 10)
+- **Maven 3.9.15** (build tool)
+- **JSF 4.0 + Facelets** (presentacion) + PrimeFaces 13+ (tema arya)
 - **CDI 4.0 + Weld 5.x** (inyeccion de dependencias, scopes)
 - **JPA 3.1 + Hibernate 6.2** (persistencia, cache 2do nivel con EhCache 3.10)
-- **MySQL 8.0** (base de datos)
+- **MySQL 8.4** (base de datos)
 - **JAX-RS 3.1 + RESTEasy** (API REST)
-- **JasperReports 6.20** (reportes PDF)
-- **Apache POI 5.2** (reportes Excel)
+- **Apache PDFBox 3.0** (reportes PDF — reemplaza a JasperReports)
+- **Apache POI 5.3** (reportes Excel)
 - **jBCrypt 0.4** (hashing de contrasenas)
 - **JUnit 5 + Mockito 5** (testing)
 

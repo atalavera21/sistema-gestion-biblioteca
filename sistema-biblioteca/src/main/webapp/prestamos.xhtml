@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <title>Mis Préstamos — Biblioteca SENATI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+    <h:outputStylesheet library="css" name="estilos.css"/>
+</h:head>
+<h:body>
+
+    <!-- Barra de sesion -->
+    <h:form>
+        <p:toolbar style="max-width:900px; margin: 10px auto;">
+            <p:toolbarGroup align="left">
+                <h:outputText value="📚 Biblioteca SENATI"/>
+            </p:toolbarGroup>
+            <p:toolbarGroup align="right">
+                <p:outputLabel value="Bienvenido, #{authBean.codigo}" rendered="#{authBean.autenticado}" style="margin-right:10px; font-weight:bold;"/>
+                <p:commandButton value="Cerrar Sesion" action="#{authBean.logout()}"
+                                 rendered="#{authBean.autenticado}" styleClass="ui-button-danger"/>
+            </p:toolbarGroup>
+        </p:toolbar>
+    </h:form>
+
+    <p:panel header="Mis Préstamos" style="max-width:900px; margin: 20px auto;">
+
+        <!-- Prestamos activos -->
+        <p:fieldset legend="Prestamos Activos" toggleable="true">
+            <h:form>
+                <p:dataTable value="#{prestamoBean.prestamosActivos}" var="p"
+                             emptyMessage="No tienes prestamos activos.">
+                    <p:column headerText="Libro">
+                        #{p.libro.titulo}
+                    </p:column>
+                    <p:column headerText="Fecha Prestamo">
+                        #{p.fechaPrestamo}
+                    </p:column>
+                    <p:column headerText="Devolver antes de">
+                        #{p.fechaDevolucionEstimada}
+                    </p:column>
+                    <p:column headerText="Estado">
+                        #{p.estado}
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:fieldset>
+
+        <br/>
+
+        <!-- Historial -->
+        <p:fieldset legend="Historial de Prestamos" toggleable="true" collapsed="true">
+            <h:form>
+                <p:dataTable value="#{prestamoBean.historial}" var="p"
+                             emptyMessage="No tienes historial de prestamos.">
+                    <p:column headerText="Libro">
+                        #{p.libro.titulo}
+                    </p:column>
+                    <p:column headerText="Fecha Prestamo">
+                        #{p.fechaPrestamo}
+                    </p:column>
+                    <p:column headerText="Devolucion Real">
+                        #{p.fechaDevolucionReal}
+                    </p:column>
+                    <p:column headerText="Estado">
+                        #{p.estado}
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:fieldset>
+
+        <br/>
+        <h:form>
+            <p:panelGrid columns="3" style="margin: 0 auto;">
+                <p:button value="Catálogo" outcome="/catalogo"/>
+                <p:button value="Cerrar Sesión" outcome="/login"/>
+            </p:panelGrid>
+        </h:form>
+
+    </p:panel>
+</h:body>
+</html>
