@@ -1,202 +1,249 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:jsf="http://xmlns.jcp.org/jsf"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
-<h:head>
-    <title>Catálogo — Biblioteca SENATI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
-    <h:outputStylesheet library="css" name="estilos.css"/>
-</h:head>
-<h:body>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:jsf="http://xmlns.jcp.org/jsf"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets" template="/WEB-INF/templates/plantilla.xhtml">
+    <ui:define name="titulo">Catálogo — Biblioteca SENATI</ui:define>
+    <ui:define name="contenido">
 
-    <!-- ========== TOPBAR ========== -->
-    <div class="topbar">
-        <div class="topbar-brand">
-            <i class="pi pi-book"></i>
-            Biblioteca SENATI
-        </div>
-        <div class="topbar-user">
-            <h:panelGroup rendered="#{authBean.autenticado}">
-                <span class="user-name">#{authBean.codigo}</span>
-                <h:form>
-                    <h:commandButton styleClass="btn-logout" value="Cerrar sesión"
-                                     action="#{authBean.logout()}"/>
-                </h:form>
-            </h:panelGroup>
-            <h:panelGroup rendered="#{not authBean.autenticado}">
-                <a href="login.xhtml" style="color:rgba(255,255,255,0.85); text-decoration:none; font-size:0.875rem;">
-                    Iniciar sesión
-                </a>
-            </h:panelGroup>
-        </div>
-    </div>
-
-    <!-- ========== LAYOUT: Sidebar + Contenido ========== -->
-    <div class="catalogo-layout">
-
-        <!-- Sidebar -->
-        <aside class="catalogo-sidebar">
-            <div class="sidebar-section">
-                <h3 class="sidebar-title">Buscar</h3>
-                <h:form id="formBuscar">
-                    <p:inputText id="keyword" value="#{catalogoBean.keyword}"
-                                 placeholder="Título o autor..."
-                                 styleClass="sidebar-search">
-                        <p:ajax event="keyup" update="libros sidebarCats"
-                                listener="#{catalogoBean.buscarPorKeyword()}"/>
-                    </p:inputText>
-                </h:form>
-            </div>
-
-            <div class="sidebar-section">
-                <h3 class="sidebar-title">Categorías</h3>
-                <h:form id="sidebarCats">
-                    <ul class="sidebar-cat-list">
-                        <li>
-                            <h:commandLink value="Todas las categorías"
-                                           action="#{catalogoBean.limpiarCategoria()}"
-                                           update="libros sidebarCats"
-                                           styleClass="sidebar-cat-link #{catalogoBean.categoriaSeleccionadaId == null ? 'sidebar-cat-active' : ''}"/>
-                        </li>
-                        <ui:repeat value="#{catalogoBean.categorias}" var="cat">
+        <div class="catalogo-layout">
+            <aside class="catalogo-sidebar">
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Buscar</h3>
+                    <h:form id="formBuscar">
+                        <p:inputText id="keyword" value="#{catalogoBean.keyword}" placeholder="Título o autor..."
+                            styleClass="sidebar-search">
+                            <p:ajax event="keyup" update="libros sidebarCats"
+                                listener="#{catalogoBean.buscarPorKeyword()}" />
+                        </p:inputText>
+                    </h:form>
+                </div>
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Categorías</h3>
+                    <h:form id="sidebarCats">
+                        <ul class="sidebar-cat-list">
                             <li>
-                                <h:commandLink value="#{cat.nombre}"
-                                               action="#{catalogoBean.seleccionarCategoria(cat.id)}"
-                                               update="libros sidebarCats"
-                                               styleClass="sidebar-cat-link #{catalogoBean.categoriaActiva(cat.id) ? 'sidebar-cat-active' : ''}"/>
+                                <h:commandLink value="Todas las categorías" action="#{catalogoBean.limpiarCategoria()}"
+                                    update="libros sidebarCats"
+                                    styleClass="sidebar-cat-link #{catalogoBean.categoriaSeleccionadaId == null ? 'sidebar-cat-active' : ''}" />
                             </li>
-                        </ui:repeat>
-                    </ul>
+                            <ui:repeat value="#{catalogoBean.categorias}" var="cat">
+                                <li>
+                                    <h:commandLink value="#{cat.nombre}"
+                                        action="#{catalogoBean.seleccionarCategoria(cat.id)}"
+                                        update="libros sidebarCats"
+                                        styleClass="sidebar-cat-link #{catalogoBean.categoriaActiva(cat.id) ? 'sidebar-cat-active' : ''}" />
+                                </li>
+                            </ui:repeat>
+                        </ul>
+                    </h:form>
+                </div>
+            </aside>
+
+            <main class="catalogo-main">
+                <div class="catalogo-header">
+                    <h1 class="page-title" style="margin:0; color:#FFFFFF !important;">
+                        #{catalogoBean.categoriaActivaNombre}</h1>
+                    <span class="catalogo-count">#{catalogoBean.resultados.size()} libro(s)</span>
+                </div>
+
+                <h:form id="formMsgs">
+                    <p:growl id="growl" showDetail="true" life="4000"/>
                 </h:form>
-            </div>
-        </aside>
 
-        <!-- Contenido principal -->
-        <main class="catalogo-main">
+                <h:form id="libros">
+                    <h:panelGroup layout="block" rendered="#{empty catalogoBean.resultados}">
+                        <div class="empty-state" style="padding:60px 20px;">
+                            <i class="pi pi-search"
+                                style="font-size:2.5rem; color:rgba(255,255,255,0.3); display:block; margin-bottom:16px;"></i>
+                            <p style="color:rgba(255,255,255,0.5);">No se encontraron libros.</p>
+                        </div>
+                    </h:panelGroup>
 
-            <div class="catalogo-header">
-                <h1 class="page-title" style="margin:0; color:#FFFFFF !important;">#{catalogoBean.categoriaActivaNombre}</h1>
-                <span class="catalogo-count">#{catalogoBean.resultados.size()} libro(s)</span>
-            </div>
+                    <div class="libros-grid">
+                        <ui:repeat value="#{catalogoBean.resultados}" var="libro">
+                            <div class="libro-card">
+                                <div class="card-cover">
+                                    <h:graphicImage value="#{libro.imagen}" rendered="#{not empty libro.imagen}"
+                                        style="width:100%; height:100%; object-fit:cover;" />
+                                    <h:panelGroup rendered="#{empty libro.imagen}" layout="block"
+                                        style="width:100%; height:100%; background:linear-gradient(135deg,#1B3A4B 0%,#15303E 100%); display:flex; align-items:center; justify-content:center; font-size:3rem;">
+                                        📖
+                                    </h:panelGroup>
+                                    <span class="card-cover-badge cat-badge">#{libro.categoria.nombre}</span>
+                                    <span
+                                        class="card-cover-badge disp-badge #{catalogoBean.getDisponibilidad(libro) == 'Disponible' ? 'disponible' : 'agotado'}">
+                                        #{catalogoBean.getDisponibilidad(libro)}
+                                    </span>
+                                </div>
+                                <div class="card-body">
+                                    <h3>#{libro.titulo}</h3>
+                                    <div class="autor">#{libro.autor}</div>
+                                    <h:panelGroup rendered="#{libro.puntuacion != null}" layout="block"
+                                                   styleClass="stars-row" style="margin-top:6px;">
+                                        <ui:repeat value="#{catalogoBean.estrellasLista(libro)}" var="s">
+                                            <span class="star #{s == 2 ? 'on' : (s == 1 ? 'half' : '')}">★</span>
+                                        </ui:repeat>
+                                        <span class="stars-count">#{libro.puntuacion}</span>
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{libro.puntuacion == null}" layout="block"
+                                                   style="margin-top:4px;">
+                                        <span style="font-family:Inter,sans-serif;font-size:0.65rem;color:#C0C0C0;">Sin valoraciones</span>
+                                    </h:panelGroup>
+                                    <div style="display:flex; justify-content:flex-end; margin-top:auto; padding-top:8px;">
+                                        <span style="font-family:Inter,sans-serif; font-size:0.65rem; color:#6b7796; background:rgba(255,255,255,0.04); padding:2px 8px; border-radius:4px;">
+                                            #{catalogoBean.stockDisponible(libro)} / #{libro.stockTotal} disp.
+                                        </span>
+                                    </div>
+                                </div>
 
-            <!-- Grid de libros -->
-            <h:form id="libros">
-                <h:panelGroup layout="block" rendered="#{empty catalogoBean.resultados}">
-                    <div class="empty-state" style="padding:60px 20px;">
-                        <i class="pi pi-search" style="font-size:2.5rem; color:rgba(255,255,255,0.3); display:block; margin-bottom:16px;"></i>
-                        <p style="color:rgba(255,255,255,0.5);">No se encontraron libros.</p>
-                    </div>
-                </h:panelGroup>
-
-                <div class="libros-grid">
-                    <ui:repeat value="#{catalogoBean.resultados}" var="libro">
-                        <div class="libro-card">
-                            <div class="card-cover">
-                                <h:graphicImage value="#{libro.imagen}"
-                                                rendered="#{not empty libro.imagen}"
-                                                style="width:100%; height:100%; object-fit:cover;"/>
-                                <h:panelGroup rendered="#{empty libro.imagen}" layout="block"
-                                               style="width:100%; height:100%; background:linear-gradient(135deg,#1B3A4B 0%,#15303E 100%); display:flex; align-items:center; justify-content:center; font-size:3rem;">
-                                    📖
+                                <!-- ===== ADMIN FOOTER ===== -->
+                                <h:panelGroup rendered="#{authBean.autenticado and authBean.rol == 'ADMIN'}" layout="block">
+                                    <div class="card-footer card-footer-admin">
+                                        <p:commandButton value="Editar" icon="pi pi-pencil"
+                                            action="#{adminBean.editarLibro(libro)}"
+                                            update=":dlgEditor"
+                                            oncomplete="PF('dlgEditor').show()"
+                                            styleClass="card-btn card-btn-outline"/>
+                                        <p:commandButton value="Eliminar" icon="pi pi-trash"
+                                            action="#{adminBean.prepararEliminar(libro)}"
+                                            update=":dlgEliminar"
+                                            oncomplete="PF('dlgEliminar').show()"
+                                            styleClass="card-btn card-btn-outline" style="color:#A42834!important; border-color:#A42834!important;"/>
+                                    </div>
                                 </h:panelGroup>
-                                <span class="card-cover-badge cat-badge">#{libro.categoria.nombre}</span>
-                                <span class="card-cover-badge disp-badge #{catalogoBean.getDisponibilidad(libro) == 'Disponible' ? 'disponible' : 'agotado'}">
-                                    #{catalogoBean.getDisponibilidad(libro)}
-                                </span>
+
+                                <!-- ===== ESTUDIANTE FOOTER ===== -->
+                                <h:panelGroup rendered="#{not authBean.autenticado or authBean.rol != 'ADMIN'}" layout="block">
+                                    <div class="card-footer">
+                                        <p:commandLink value="Ver detalle" action="#{catalogoBean.verDetalle(libro.id)}"
+                                            update=":formDialogo" oncomplete="PF('dlgDetalle').show()"
+                                            styleClass="card-btn card-btn-outline" />
+                                        <h:outputText value="Agotado"
+                                            rendered="#{catalogoBean.getDisponibilidad(libro) != 'Disponible'}"
+                                            style="font-family:Inter,system-ui,sans-serif; font-size:0.75rem; color:#9E9E9E; font-weight:500;" />
+                                        <h:outputLink value="/sistema-gestion-biblioteca/index.xhtml"
+                                            styleClass="card-btn card-btn-solid"
+                                            rendered="#{catalogoBean.getDisponibilidad(libro) == 'Disponible' and not authBean.autenticado}">
+                                            Iniciar sesión
+                                        </h:outputLink>
+                                        <p:commandButton styleClass="card-btn card-btn-solid" value="Solicitar"
+                                            action="#{prestamoBean.prepararSolicitud(libro)}"
+                                            oncomplete="PF('dlgConfirmarPrestamo').show()"
+                                            update=":formConfirmarPrestamo"
+                                            rendered="#{catalogoBean.getDisponibilidad(libro) == 'Disponible' and authBean.autenticado}" />
+                                    </div>
+                                </h:panelGroup>
                             </div>
-                            <div class="card-body">
-                                <h3>#{libro.titulo}</h3>
-                                <div class="autor">#{libro.autor}</div>
-                            </div>
-                            <div class="card-footer">
-                                <p:commandLink value="Ver detalle" action="#{catalogoBean.verDetalle(libro.id)}"
-                                               update=":formDialogo" oncomplete="PF('dlgDetalle').show()"
-                                               styleClass="card-btn card-btn-outline"/>
-                                <h:commandButton styleClass="card-btn card-btn-solid" value="Solicitar"
-                                                 action="#{prestamoBean.solicitarPrestamo(libro.id)}"
-                                                 rendered="#{catalogoBean.getDisponibilidad(libro) == 'Disponible'}"/>
-                                <h:outputText value="Agotado" rendered="#{catalogoBean.getDisponibilidad(libro) != 'Disponible'}"
-                                              style="font-family:Inter,system-ui,sans-serif; font-size:0.75rem; color:#9E9E9E; font-weight:500;"/>
-                            </div>
-                        </div>
-                    </ui:repeat>
-                </div>
-            </h:form>
-
-        </main>
-    </div>
-
-    <!-- ========== MODAL DETALLE ========== -->
-    <h:form id="formDialogo">
-        <p:dialog id="dlgDetalle" widgetVar="dlgDetalle" header="#{catalogoBean.libroSeleccionado != null ? catalogoBean.libroSeleccionado.titulo : ''}"
-                  width="720" modal="true" closable="true" resizable="false" showEffect="fade" hideEffect="fade"
-                  styleClass="modal-detalle" onHide="#{catalogoBean.cerrarDetalle()}">
-
-            <p:outputPanel rendered="#{catalogoBean.libroSeleccionado != null}" layout="block">
-                <div class="modal-detalle-grid">
-
-                    <!-- Portada -->
-                    <div class="modal-detalle-cover">
-                        <h:graphicImage value="#{catalogoBean.libroSeleccionado.imagen}"
-                                        rendered="#{not empty catalogoBean.libroSeleccionado.imagen}"
-                                        style="width:100%; height:100%; object-fit:cover; border-radius:8px;"/>
-                        <h:panelGroup rendered="#{empty catalogoBean.libroSeleccionado.imagen}" layout="block"
-                                       style="width:100%; min-height:340px; border-radius:8px; background:linear-gradient(135deg,#1B3A4B 0%,#0F2837 100%); display:flex; align-items:center; justify-content:center; font-size:5rem;">
-                            📖
-                        </h:panelGroup>
+                        </ui:repeat>
                     </div>
+                </h:form>
+            </main>
+        </div>
 
-                    <!-- Info -->
-                    <div class="modal-detalle-info">
-                        <span class="modal-categoria-badge">#{catalogoBean.libroSeleccionado.categoria.nombre}</span>
-                        <h2 class="modal-titulo">#{catalogoBean.libroSeleccionado.titulo}</h2>
-                        <p class="modal-autor">por <strong>#{catalogoBean.libroSeleccionado.autor}</strong></p>
-
-                        <div class="modal-meta-grid">
-                            <div class="modal-meta-item">
-                                <span class="meta-label">ISBN</span>
-                                <span class="meta-value">#{empty catalogoBean.libroSeleccionado.isbn ? '—' : catalogoBean.libroSeleccionado.isbn}</span>
-                            </div>
-                            <div class="modal-meta-item">
-                                <span class="meta-label">Editorial</span>
-                                <span class="meta-value">#{empty catalogoBean.libroSeleccionado.editorial ? '—' : catalogoBean.libroSeleccionado.editorial}</span>
-                            </div>
-                            <div class="modal-meta-item">
-                                <span class="meta-label">Año</span>
-                                <span class="meta-value">#{catalogoBean.libroSeleccionado.anioPublicacion != null ? catalogoBean.libroSeleccionado.anioPublicacion : '—'}</span>
-                            </div>
-                            <div class="modal-meta-item">
-                                <span class="meta-label">Páginas</span>
-                                <span class="meta-value">#{catalogoBean.libroSeleccionado.paginas != null ? catalogoBean.libroSeleccionado.paginas : '—'}</span>
-                            </div>
-                            <div class="modal-meta-item">
-                                <span class="meta-label">Idioma</span>
-                                <span class="meta-value">#{empty catalogoBean.libroSeleccionado.idioma ? '—' : catalogoBean.libroSeleccionado.idioma}</span>
-                            </div>
-                            <div class="modal-meta-item">
-                                <span class="meta-label">Stock</span>
-                                <span class="meta-value" style="font-weight:700; color:#2D6A4F;">
-                                    #{catalogoBean.libroSeleccionado.stockTotal} unid.
-                                </span>
-                            </div>
+        <!-- Modal detalle -->
+        <h:form id="formDialogo">
+            <p:dialog id="dlgDetalle" widgetVar="dlgDetalle"
+                header="#{catalogoBean.libroSeleccionado != null ? catalogoBean.libroSeleccionado.titulo : ''}"
+                width="720" modal="true" closable="true" resizable="false" showEffect="fade" hideEffect="fade"
+                styleClass="modal-detalle">
+                <p:ajax event="close" listener="#{catalogoBean.cerrarDetalle()}" update="formDialogo" />
+                <p:outputPanel rendered="#{catalogoBean.libroSeleccionado != null}" layout="block">
+                    <div class="modal-detalle-grid">
+                        <div class="modal-detalle-cover">
+                            <h:graphicImage value="#{catalogoBean.libroSeleccionado.imagen}"
+                                rendered="#{not empty catalogoBean.libroSeleccionado.imagen}"
+                                style="width:100%; height:100%; object-fit:cover; border-radius:8px;" />
+                            <h:panelGroup rendered="#{empty catalogoBean.libroSeleccionado.imagen}" layout="block"
+                                style="width:100%; min-height:340px; border-radius:8px; background:linear-gradient(135deg,#1B3A4B 0%,#0F2837 100%); display:flex; align-items:center; justify-content:center; font-size:5rem;">
+                                📖
+                            </h:panelGroup>
                         </div>
-
-                        <div class="modal-divider"></div>
-
-                        <div class="modal-descripcion">
-                            <h4>Resumen</h4>
-                            <p>#{empty catalogoBean.libroSeleccionado.descripcion ? 'Sin descripción disponible.' : catalogoBean.libroSeleccionado.descripcion}</p>
+                        <div class="modal-detalle-info">
+                            <span
+                                class="modal-categoria-badge">#{catalogoBean.libroSeleccionado.categoria.nombre}</span>
+                            <h2 class="modal-titulo">#{catalogoBean.libroSeleccionado.titulo}</h2>
+                            <p class="modal-autor">por <strong>#{catalogoBean.libroSeleccionado.autor}</strong></p>
+                            <h:panelGroup rendered="#{catalogoBean.libroSeleccionado.puntuacion != null}" layout="block"
+                                           styleClass="stars-row" style="margin-bottom:12px;">
+                                <ui:repeat value="#{catalogoBean.estrellasLista(catalogoBean.libroSeleccionado)}" var="s">
+                                    <span class="star #{s == 2 ? 'on' : (s == 1 ? 'half' : '')}" style="font-size:1.1rem;">★</span>
+                                </ui:repeat>
+                                <span class="stars-count" style="font-size:0.8rem;">#{catalogoBean.libroSeleccionado.puntuacion} (#{catalogoBean.libroSeleccionado.totalValoraciones})</span>
+                            </h:panelGroup>
+                            <div class="modal-meta-grid">
+                                <div class="modal-meta-item"><span class="meta-label">ISBN</span><span
+                                        class="meta-value">#{empty catalogoBean.libroSeleccionado.isbn ? '—' :
+                                        catalogoBean.libroSeleccionado.isbn}</span></div>
+                                <div class="modal-meta-item"><span class="meta-label">Editorial</span><span
+                                        class="meta-value">#{empty catalogoBean.libroSeleccionado.editorial ? '—' :
+                                        catalogoBean.libroSeleccionado.editorial}</span></div>
+                                <div class="modal-meta-item"><span class="meta-label">Año</span><span
+                                        class="meta-value">#{catalogoBean.libroSeleccionado.anioPublicacion != null ?
+                                        catalogoBean.libroSeleccionado.anioPublicacion : '—'}</span></div>
+                                <div class="modal-meta-item"><span class="meta-label">Páginas</span><span
+                                        class="meta-value">#{catalogoBean.libroSeleccionado.paginas != null ?
+                                        catalogoBean.libroSeleccionado.paginas : '—'}</span></div>
+                                <div class="modal-meta-item"><span class="meta-label">Idioma</span><span
+                                        class="meta-value">#{empty catalogoBean.libroSeleccionado.idioma ? '—' :
+                                        catalogoBean.libroSeleccionado.idioma}</span></div>
+                                <div class="modal-meta-item"><span class="meta-label">Stock</span><span
+                                        class="meta-value"
+                                        style="font-weight:700; color:#2D6A4F;">#{catalogoBean.libroSeleccionado.stockTotal}
+                                        unid.</span></div>
+                            </div>
+                            <div class="modal-divider"></div>
+                            <div class="modal-descripcion">
+                                <h4>Resumen</h4>
+                                <p>#{empty catalogoBean.libroSeleccionado.descripcion ? 'Sin descripción disponible.' :
+                                    catalogoBean.libroSeleccionado.descripcion}</p>
+                            </div>
+                            <h:panelGroup rendered="#{authBean.autenticado}" layout="block">
+                                <div class="modal-divider"></div>
+                                <div style="text-align:center; padding:8px 0;">
+                                    <span style="font-family:Inter,sans-serif; font-size:0.75rem; color:#6b7796;">
+                                        <i class="pi pi-info-circle" style="margin-right:4px;"></i>
+                                        Valora este libro desde Mis Préstamos
+                                    </span>
+                                </div>
+                            </h:panelGroup>
                         </div>
                     </div>
+                </p:outputPanel>
+            </p:dialog>
+        </h:form>
+    <ui:include src="/WEB-INF/includes/modales-admin.xhtml"/>
 
+    <h:panelGroup id="tablaAdmin" style="display:none;"/>
+    <h:panelGroup id="mensajesAdmin" style="display:none;"/>
+
+    <!-- Modal confirmación préstamo -->
+    <h:form id="formConfirmarPrestamo">
+        <p:dialog id="dlgConfirmarPrestamo" widgetVar="dlgConfirmarPrestamo"
+                  header="Confirmar Préstamo" width="440" modal="true" closable="true"
+                  styleClass="modal-admin" showEffect="fade" hideEffect="fade">
+            <div class="modal-admin-body" style="text-align:center;">
+                <div style="margin-bottom:20px; color:#b8c2d6; font-family:Inter,sans-serif; font-size:0.9rem; line-height:1.6;">
+                    <p style="margin:0 0 8px 0; font-weight:600; color:#e8edf5; font-size:1rem;">#{prestamoBean.libroParaSolicitar.titulo}</p>
+                    <p style="margin:0;">Al solicitar este préstamo aceptas las siguientes condiciones:</p>
                 </div>
-            </p:outputPanel>
-
+                <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:16px; margin-bottom:20px; text-align:left; font-family:Inter,sans-serif; font-size:0.8rem; color:#8a94a8; line-height:1.7;">
+                    <p style="margin:0 0 8px 0;">&#8226; El préstamo tiene una duración de <strong style="color:#e8edf5;">14 días</strong>.</p>
+                    <p style="margin:0 0 8px 0;">&#8226; Debes devolver el libro en buen estado.</p>
+                    <p style="margin:0 0 8px 0;">&#8226; La devolución tardía genera <strong style="color:#f87171;">penalización</strong>.</p>
+                    <p style="margin:0;">&#8226; Máximo <strong style="color:#e8edf5;">3 préstamos activos</strong> simultáneos.</p>
+                </div>
+                <div style="display:flex; gap:12px; justify-content:center;">
+                    <p:commandButton value="Aceptar" icon="pi pi-check"
+                                     action="#{prestamoBean.solicitarPrestamo(prestamoBean.libroParaSolicitar.id)}"
+                                     update="@form :formMsgs :libros"
+                                     oncomplete="PF('dlgConfirmarPrestamo').hide()"
+                                     styleClass="btn-primary"/>
+                    <p:commandButton value="Rechazar" icon="pi pi-times"
+                                     onclick="PF('dlgConfirmarPrestamo').hide()"
+                                     styleClass="btn-secondary" immediate="true"/>
+                </div>
+            </div>
         </p:dialog>
     </h:form>
 
-</h:body>
-</html>
+</ui:define>
+</ui:composition>

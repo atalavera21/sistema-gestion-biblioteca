@@ -183,6 +183,69 @@ public class ReporteService {
             new String[]{"Libro", "Usuario", "Vencia", "Estado"}, datos);
     }
 
+    // ============================================================
+    // Reportes: Libros por categoria
+    // ============================================================
+
+    public byte[] generarLibrosPorCategoria(int top) {
+        List<Object[]> datos = prestamoDAO.findLibrosPorCategoria(top);
+        List<String[]> filas = new ArrayList<>();
+        for (Object[] row : datos) {
+            filas.add(new String[]{
+                row[0] != null ? row[0].toString() : "",
+                row[1] != null ? row[1].toString() : ""
+            });
+        }
+        return generarPDF("Prestamos por categoria (Top " + top + ")",
+            new String[]{"Categoria", "Prestamos"}, filas,
+            new float[]{60, 40});
+    }
+
+    public byte[] generarExcelLibrosPorCategoria(int top) {
+        List<Object[]> datos = prestamoDAO.findLibrosPorCategoria(top);
+        return generarExcel("Prestamos por categoria",
+            new String[]{"Categoria", "Cantidad de prestamos"}, datos);
+    }
+
+    // ============================================================
+    // Reportes: Prestamos penalizados
+    // ============================================================
+
+    public byte[] generarPrestamosPenalizados() {
+        List<Prestamo> penalizados = prestamoDAO.findPrestamosPenalizados();
+        List<String[]> filas = new ArrayList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        for (Prestamo p : penalizados) {
+            filas.add(new String[]{
+                p.getLibro().getTitulo(),
+                p.getUsuario().getNombre(),
+                p.getUsuario().getCodigoUniversitario(),
+                sdf.format(p.getFechaDevolucionEstimada()),
+                p.getEstado().toString()
+            });
+        }
+        return generarPDF("Prestamos penalizados al " + sdf.format(new Date()),
+            new String[]{"Libro", "Usuario", "Codigo", "Vencia", "Estado"}, filas,
+            new float[]{30, 25, 15, 15, 15});
+    }
+
+    public byte[] generarExcelPrestamosPenalizados() {
+        List<Prestamo> penalizados = prestamoDAO.findPrestamosPenalizados();
+        List<Object[]> datos = new ArrayList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        for (Prestamo p : penalizados) {
+            datos.add(new Object[]{
+                p.getLibro().getTitulo(),
+                p.getUsuario().getNombre(),
+                p.getUsuario().getCodigoUniversitario(),
+                sdf.format(p.getFechaDevolucionEstimada()),
+                p.getEstado().toString()
+            });
+        }
+        return generarExcel("Prestamos penalizados",
+            new String[]{"Libro", "Usuario", "Codigo", "Vencia", "Estado"}, datos);
+    }
+
     private byte[] generarExcel(String tituloHoja, String[] columnas, List<Object[]> filas) {
         try (Workbook wb = new XSSFWorkbook();
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {

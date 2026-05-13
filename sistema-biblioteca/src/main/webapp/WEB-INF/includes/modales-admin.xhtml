@@ -1,0 +1,183 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <!-- ===== MODAL: EDITAR LIBRO ===== -->
+    <h:form id="dlgEditor">
+        <p:dialog id="dlgEditorWidget" widgetVar="dlgEditor"
+                  header="#{adminBean.libroEdicion.id != null ? 'Editar: '.concat(adminBean.libroEdicion.titulo) : 'Editar Libro'}"
+                  width="900" modal="true" closable="true" resizable="false"
+                  showEffect="fade" hideEffect="fade"
+                  styleClass="modal-admin"
+                  onHide="#{adminBean.cerrarEditor()}">
+            <p:outputPanel rendered="#{adminBean.libroEdicion.id != null}" layout="block">
+                <div class="modal-admin-body">
+                    <div class="crud-layout" style="gap:28px;">
+                        <div class="crud-preview" style="position:static; top:auto;">
+                            <div class="crud-preview-label">Vista Previa</div>
+                            <h:panelGroup id="previewEditarPanel" layout="block">
+                                <div class="preview-card">
+                                    <div class="preview-cover">
+                                        <h:graphicImage value="#{adminBean.libroEdicion.imagen}"
+                                                        rendered="#{not empty adminBean.libroEdicion.imagen}"
+                                                        style="width:100%; height:100%; object-fit:cover;"/>
+                                        <h:panelGroup rendered="#{empty adminBean.libroEdicion.imagen}" layout="block"
+                                                       style="width:100%; height:100%; background:linear-gradient(135deg,#1B3A4B 0%,#0F2837 100%); display:flex; align-items:center; justify-content:center; font-size:3.5rem;">
+                                            📖
+                                        </h:panelGroup>
+                                    </div>
+                                    <div class="preview-body">
+                                        <h3>#{adminBean.libroEdicion.titulo}</h3>
+                                        <div class="autor">#{adminBean.libroEdicion.autor}</div>
+                                        <span class="categoria">#{adminBean.libroEdicion.categoria != null ? adminBean.libroEdicion.categoria.nombre : ''}</span>
+                                        <div class="preview-meta">
+                                            <span>#{adminBean.libroEdicion.editorial}</span>
+                                            <span>#{adminBean.libroEdicion.anioPublicacion}</span>
+                                            <span>#{adminBean.libroEdicion.paginas} pág.</span>
+                                        </div>
+                                    </div>
+                                    <div class="preview-footer">
+                                        <span class="preview-stock">Stock: #{adminBean.libroEdicion.stockTotal}</span>
+                                        <span class="preview-idioma">#{adminBean.libroEdicion.idioma}</span>
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+                        </div>
+                        <div class="crud-form" style="gap:12px;">
+                            <div class="form-section">
+                                <div class="form-section-title"><i class="pi pi-info-circle"></i> Información</div>
+                                <div class="admin-form-group">
+                                    <label>Título <span class="required">*</span></label>
+                                    <p:inputText id="tituloEditar" value="#{adminBean.libroEdicion.titulo}" required="true">
+                                        <p:ajax event="keyup" update="previewEditarPanel"/>
+                                    </p:inputText>
+                                </div>
+                                <div class="form-row-2col">
+                                    <div class="admin-form-group">
+                                        <label>Autor <span class="required">*</span></label>
+                                        <p:inputText id="autorEditar" value="#{adminBean.libroEdicion.autor}" required="true">
+                                            <p:ajax event="keyup" update="previewEditarPanel"/>
+                                        </p:inputText>
+                                    </div>
+                                    <div class="admin-form-group">
+                                        <label>ISBN</label>
+                                        <p:inputText id="isbnEditar" value="#{adminBean.libroEdicion.isbn}"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-section">
+                                <div class="form-section-title"><i class="pi pi-tag"></i> Clasificación</div>
+                                <div class="form-row-2col">
+                                    <div class="admin-form-group">
+                                        <label>Categoría <span class="required">*</span></label>
+                                        <p:selectOneMenu id="catEditar" value="#{adminBean.libroEdicion.categoria}"
+                                                         converter="categoriaConverter" style="width:100%;">
+                                            <f:selectItems value="#{adminBean.categorias}" var="cat"
+                                                           itemLabel="#{cat.nombre}" itemValue="#{cat}"/>
+                                            <p:ajax event="change" update="previewEditarPanel"/>
+                                        </p:selectOneMenu>
+                                    </div>
+                                    <div class="admin-form-group">
+                                        <label>Stock <span class="required">*</span></label>
+                                        <p:inputText id="stockEditar" value="#{adminBean.libroEdicion.stockTotal}" required="true">
+                                            <p:ajax event="keyup" update="previewEditarPanel"/>
+                                        </p:inputText>
+                                    </div>
+                                </div>
+                                <div class="form-row-2col" style="margin-top:12px;">
+                                    <div class="admin-form-group" style="grid-column:1/-1;">
+                                        <label>Días de préstamo</label>
+                                        <p:inputText id="diasEditar" value="#{adminBean.libroEdicion.diasPrestamo}"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-section">
+                                <div class="form-section-title"><i class="pi pi-bookmark"></i> Detalles</div>
+                                <div class="form-row-2col">
+                                    <div class="admin-form-group">
+                                        <label>Editorial</label>
+                                        <p:inputText id="editEditar" value="#{adminBean.libroEdicion.editorial}">
+                                            <p:ajax event="keyup" update="previewEditarPanel"/>
+                                        </p:inputText>
+                                    </div>
+                                    <div class="admin-form-group">
+                                        <label>Año</label>
+                                        <p:inputText id="anioEditar" value="#{adminBean.libroEdicion.anioPublicacion}">
+                                            <p:ajax event="keyup" update="previewEditarPanel"/>
+                                        </p:inputText>
+                                    </div>
+                                </div>
+                                <div class="form-row-2col">
+                                    <div class="admin-form-group">
+                                        <label>Páginas</label>
+                                        <p:inputText id="pagEditar" value="#{adminBean.libroEdicion.paginas}"/>
+                                    </div>
+                                    <div class="admin-form-group">
+                                        <label>Idioma</label>
+                                        <p:inputText id="idiomaEditar" value="#{adminBean.libroEdicion.idioma}"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="admin-form-group">
+                                <label>URL de imagen</label>
+                                <p:inputText id="imgEditar" value="#{adminBean.libroEdicion.imagen}">
+                                    <p:ajax event="keyup" update="previewEditarPanel"/>
+                                </p:inputText>
+                            </div>
+                            <div class="admin-form-group">
+                                <label>Resumen</label>
+                                <p:inputTextarea id="descEditar" value="#{adminBean.libroEdicion.descripcion}"
+                                                 rows="2" style="resize:vertical; min-height:60px;"/>
+                            </div>
+                            <div class="form-actions" style="margin-top:4px;">
+                                <p:commandButton value="Guardar Cambios" icon="pi pi-check"
+                                                 action="#{adminBean.guardarEdicion()}"
+                                                 update=":tablaAdmin :libros :mensajesAdmin :formMsgs"
+                                                 oncomplete="PF('dlgEditor').hide()"
+                                                 styleClass="btn-primary"/>
+                                <p:commandButton value="Cancelar" icon="pi pi-times"
+                                                 onclick="PF('dlgEditor').hide()"
+                                                 styleClass="btn-secondary" immediate="true"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </p:outputPanel>
+        </p:dialog>
+    </h:form>
+
+    <!-- ===== MODAL: ELIMINAR ===== -->
+    <h:form id="dlgEliminar">
+        <p:dialog id="dlgEliminarWidget" widgetVar="dlgEliminar"
+                  header="Confirmar Eliminación"
+                  width="480" modal="true" closable="true" resizable="false"
+                  showEffect="fade" hideEffect="fade"
+                  styleClass="modal-admin modal-delete">
+            <p:outputPanel rendered="#{adminBean.libroAEliminar != null}" layout="block">
+                <div class="modal-delete-body">
+                    <div class="modal-delete-icon"><i class="pi pi-exclamation-triangle"></i></div>
+                    <h3>¿Eliminar este libro?</h3>
+                    <p class="modal-delete-book">
+                        <strong>#{adminBean.libroAEliminar.titulo}</strong>
+                        <span class="modal-delete-author">por #{adminBean.libroAEliminar.autor}</span>
+                        <span class="modal-delete-cat">#{adminBean.libroAEliminar.categoria.nombre}</span>
+                    </p>
+                    <p class="modal-delete-warning">Esta acción no se puede deshacer.</p>
+                    <div class="modal-delete-actions">
+                        <p:commandButton value="Sí, Eliminar" icon="pi pi-trash"
+                                         action="#{adminBean.ejecutarEliminar()}"
+                                         update=":tablaAdmin :libros :mensajesAdmin :formMsgs"
+                                         oncomplete="PF('dlgEliminar').hide()"
+                                         styleClass="btn-delete btn-delete-confirm"/>
+                        <p:commandButton value="Cancelar" icon="pi pi-times"
+                                         onclick="PF('dlgEliminar').hide()"
+                                         styleClass="btn-secondary" immediate="true"/>
+                    </div>
+                </div>
+            </p:outputPanel>
+        </p:dialog>
+    </h:form>
+
+</ui:composition>

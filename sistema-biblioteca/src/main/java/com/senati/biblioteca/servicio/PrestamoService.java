@@ -53,7 +53,7 @@ public class PrestamoService {
         prestamo.setLibro(libro);
         prestamo.setUsuario(usuario);
         prestamo.setFechaPrestamo(new Date());
-        prestamo.setFechaDevolucionEstimada(sumarDias(new Date(), 14));
+        prestamo.setFechaDevolucionEstimada(sumarDias(new Date(), libro.getDiasPrestamo()));
         prestamo.setEstado(EstadoPrestamo.ACTIVO);
 
         return prestamoDAO.save(prestamo);
@@ -66,15 +66,18 @@ public class PrestamoService {
         }
 
         prestamo.setFechaDevolucionReal(new Date());
+        Usuario usuario = prestamo.getUsuario();
 
         if (new Date().after(prestamo.getFechaDevolucionEstimada())) {
             prestamo.setEstado(EstadoPrestamo.PENALIZADO);
-            Usuario usuario = prestamo.getUsuario();
             usuario.setPenalizado(true);
+            ajustarPuntuacion(usuario, -5.0);
             usuarioDAO.save(usuario);
             notificacionService.notificarPenalizacion(usuario.getCodigoUniversitario());
         } else {
             prestamo.setEstado(EstadoPrestamo.DEVUELTO);
+            ajustarPuntuacion(usuario, +2.0);
+            usuarioDAO.save(usuario);
         }
 
         return prestamoDAO.save(prestamo);
@@ -96,6 +99,18 @@ public class PrestamoService {
         return prestamoDAO.findVencidos();
     }
 
+    public List<Prestamo> buscarPrestamosActivos() {
+        return prestamoDAO.findAllActivos();
+    }
+
+    public List<Prestamo> buscarPrestamosActivosConFiltros(String keyword, Long categoriaId) {
+        return prestamoDAO.searchActivos(keyword, categoriaId);
+    }
+
+    public List<Prestamo> buscarDevolucionesPendientes() {
+        return prestamoDAO.findDevolucionesPendientes();
+    }
+
     public List<Prestamo> buscarPrestamosPorRangoFechas(Date inicio, Date fin) {
         return prestamoDAO.findByRangoFechas(inicio, fin);
     }
@@ -111,5 +126,11 @@ public class PrestamoService {
         cal.setTime(fecha);
         cal.add(Calendar.DAY_OF_MONTH, dias);
         return cal.getTime();
+    }
+
+    private void ajustarPuntuacion(Usuario usuario, double delta) {
+        double actual = usuario.getPuntuacion() != null ? usuario.getPuntuacion() : 50.0;
+        double nueva = Math.max(0.0, Math.min(100.0, actual + delta));
+        usuario.setPuntuacion(nueva);
     }
 }

@@ -1,5 +1,6 @@
 package com.senati.biblioteca.servicio;
 
+import com.senati.biblioteca.modelo.Usuario;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -15,25 +16,14 @@ public class LdapAuthService implements AuthService {
     @Override
     public boolean autenticar(String username, String password) {
         try {
-            Object[] result = (Object[]) em.createNativeQuery(
-                "SELECT password, activo FROM ldap_users WHERE username = ?")
-                .setParameter(1, username)
+            Usuario usuario = em.createQuery(
+                "SELECT u FROM Usuario u WHERE u.codigoUniversitario = :username AND u.activo = true",
+                Usuario.class)
+                .setParameter("username", username)
                 .getSingleResult();
 
-            String hash = (String) result[0];
-
-            Object activoVal = result[1];
-            boolean activo;
-            if (activoVal instanceof Boolean) {
-                activo = (Boolean) activoVal;
-            } else {
-                activo = activoVal != null && ((Number) activoVal).intValue() != 0;
-            }
-
-            if (!activo) return false;
-            return BCrypt.checkpw(password, hash);
-
-        } catch (Exception e) {
+            return BCrypt.checkpw(password, usuario.getPassword());
+        } catch (NoResultException e) {
             return false;
         }
     }
@@ -41,9 +31,10 @@ public class LdapAuthService implements AuthService {
     @Override
     public String obtenerRol(String username) {
         try {
-            return (String) em.createNativeQuery(
-                "SELECT rol FROM ldap_users WHERE username = ? AND activo = true")
-                .setParameter(1, username)
+            return em.createQuery(
+                "SELECT u.rol FROM Usuario u WHERE u.codigoUniversitario = :username AND u.activo = true",
+                String.class)
+                .setParameter("username", username)
                 .getSingleResult();
         } catch (NoResultException e) {
             return null;

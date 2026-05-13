@@ -1,60 +1,370 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
-<h:head>
-    <title>Administración — Biblioteca SENATI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
-    <h:outputStylesheet library="css" name="estilos.css"/>
-</h:head>
-<h:body>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/templates/plantilla.xhtml">
+<ui:define name="titulo">Administración — Biblioteca SENATI</ui:define>
+<ui:define name="contenido">
 
     <h:panelGroup rendered="#{not authBean.autenticado or authBean.rol != 'ADMIN'}">
         <div class="access-denied">
             <p>Acceso denegado.</p>
-            <p><a href="/sistema-gestion-biblioteca/login.xhtml">Iniciar sesión como administrador</a></p>
+            <p><a href="/sistema-gestion-biblioteca/index.xhtml">Iniciar sesión como administrador</a></p>
         </div>
     </h:panelGroup>
 
     <h:panelGroup rendered="#{authBean.autenticado and authBean.rol == 'ADMIN'}">
+        <div class="admin-container admin-gestion-page">
 
-        <!-- ========== TOPBAR ========== -->
-        <div class="topbar">
-            <div class="topbar-brand">
-                <i class="pi pi-book"></i>
-                Biblioteca SENATI
+            <div class="admin-page-header">
+                <div class="admin-module-heading">
+                    <div class="admin-breadcrumb">
+                        <a href="/sistema-gestion-biblioteca/admin/index.xhtml">Panel de administracion</a>
+                        <i class="pi pi-angle-right"/>
+                        <span>Gestion de libros</span>
+                    </div>
+                    <h1 class="page-title admin-page-title">Gestion de Libros</h1>
+                    <p class="admin-page-subtitle">Administra el catalogo, controla prestamos activos y registra devoluciones pendientes desde esta vista.</p>
+                </div>
+                <div>
+                    <h1 class="page-title admin-page-title">Panel de Administración</h1>
+                    <p class="admin-page-subtitle">Gestión del catálogo bibliográfico</p>
+                </div>
             </div>
-            <div class="topbar-user">
-                <span class="user-name">#{authBean.codigo}</span>
+
+            <h:form id="mensajesAdmin">
+                <p:growl id="growlAdmin" showDetail="true" life="4000"/>
+            </h:form>
+
+            <h:form id="formConfirmacionAdmin">
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade"
+                                 responsive="true" width="420" styleClass="confirm-dialog">
+                    <p:commandButton value="Confirmar" type="button"
+                                     styleClass="ui-confirmdialog-yes btn-primary" icon="pi pi-check"/>
+                    <p:commandButton value="Cancelar" type="button"
+                                     styleClass="ui-confirmdialog-no btn-secondary" icon="pi pi-times"/>
+                </p:confirmDialog>
+            </h:form>
+
+            <!-- ===== MENÚ PRINCIPAL: 2 BOTONES GRANDES ===== -->
+            <div class="admin-menu-grid">
                 <h:form>
-                    <h:commandButton styleClass="btn-logout" value="Cerrar sesión"
-                                     action="#{authBean.logout()}"/>
+                    <p:commandLink styleClass="admin-menu-card #{empty adminBean.seccion or adminBean.seccion == 'libros' or adminBean.seccion == 'prestamos' or adminBean.seccion == 'devoluciones' ? 'admin-menu-card-active' : ''}"
+                                   action="#{adminBean.setSeccion('libros')}" update=":seccionPanel :mensajesAdmin">
+                        <span class="admin-menu-icon">
+                            <i class="pi pi-book"/>
+                        </span>
+                        <span class="admin-menu-content">
+                            <span class="admin-menu-title">Gestión de Libros</span>
+                            <span class="admin-menu-desc">Administrar catálogo, préstamos y devoluciones</span>
+                        </span>
+                    </p:commandLink>
                 </h:form>
+
+                <a href="/sistema-gestion-biblioteca/admin/reportes.xhtml" class="admin-menu-card">
+                    <span class="admin-menu-icon" style="background:rgba(201,169,110,0.15);">
+                        <i class="pi pi-chart-bar" style="color:#C9A96E;"/>
+                    </span>
+                    <span class="admin-menu-content">
+                        <span class="admin-menu-title">Reportes</span>
+                        <span class="admin-menu-desc">Generar reportes en PDF y Excel</span>
+                    </span>
+                </a>
+            </div>
+
+            <!-- ===== PANEL DE SECCIONES (GESTIÓN DE LIBROS) ===== -->
+            <section class="admin-section admin-section-active">
+                <div class="admin-section-header">
+                    <span class="admin-menu-icon">
+                        <i class="pi pi-book"/>
+                    </span>
+                    <span class="admin-menu-content">
+                        <span class="admin-menu-title">GestiÃ³n de Libros</span>
+                        <span class="admin-menu-desc">Administrar catÃ¡logo, prÃ©stamos y devoluciones</span>
+                    </span>
+                </div>
+
+                <div class="admin-section-header admin-section-header-clean">
+                    <span class="admin-menu-icon">
+                        <i class="pi pi-book"/>
+                    </span>
+                    <span class="admin-menu-content">
+                        <span class="admin-menu-title">Gestion de Libros</span>
+                        <span class="admin-menu-desc">Administrar catalogo, prestamos y devoluciones</span>
+                    </span>
+                </div>
+
+            <h:panelGroup id="seccionPanel" rendered="#{adminBean.seccion == 'libros' or adminBean.seccion == 'prestamos' or adminBean.seccion == 'devoluciones'}" layout="block">
+
+                <!-- Sub-tabs -->
+                <h:form id="formSubTabs">
+                    <div class="admin-subtabs">
+                        <p:commandButton value="Libros" icon="pi pi-list"
+                                         styleClass="admin-subtab #{adminBean.seccion == 'libros' ? 'admin-subtab-active' : ''}"
+                                         action="#{adminBean.setSeccion('libros')}" update=":seccionPanel :mensajesAdmin"/>
+                        <p:commandButton value="Préstamos Activos" icon="pi pi-bookmark"
+                                         styleClass="admin-subtab #{adminBean.seccion == 'prestamos' ? 'admin-subtab-active' : ''}"
+                                         action="#{adminBean.setSeccion('prestamos')}" update=":seccionPanel :mensajesAdmin"/>
+                        <p:commandButton value="Devoluciones Pendientes" icon="pi pi-clock"
+                                         styleClass="admin-subtab #{adminBean.seccion == 'devoluciones' ? 'admin-subtab-active' : ''}"
+                                         action="#{adminBean.setSeccion('devoluciones')}" update=":seccionPanel :mensajesAdmin"/>
+                    </div>
+                </h:form>
+
+                <h:panelGroup id="contenidoSeccion" layout="block">
+
+                <!-- ============ SECCIÓN 1: LIBROS ============ -->
+                <h:panelGroup rendered="#{adminBean.seccion == 'libros'}" layout="block">
+                    <div class="admin-card">
+                        <div class="table-header-bar">
+                            <h2 class="admin-card-header" style="margin-bottom:0; padding-bottom:0; border-bottom:none;">
+                                <span class="admin-card-icon"><i class="pi pi-list"/></span>
+                                Libros Registrados
+                            </h2>
+                            <div style="display:flex; gap:12px; align-items:center;">
+                                <span class="table-count">#{adminBean.listaLibros.size()} libro(s)</span>
+                                <h:form style="display:contents;">
+                                    <p:commandButton value="Nuevo Libro" icon="pi pi-plus"
+                                                     action="#{adminBean.prepararNuevo()}"
+                                                     update=":dlgCrear"
+                                                     oncomplete="PF('dlgCrearWidget').show()"
+                                                     styleClass="btn-primary"/>
+                                </h:form>
+                            </div>
+                        </div>
+
+                        <h:form id="formFiltrosLibros">
+                            <div class="filter-bar">
+                                <div class="filter-input-group">
+                                    <i class="pi pi-search filter-input-icon"/>
+                                    <p:inputText value="#{adminBean.keywordLibros}"
+                                                 placeholder="Buscar por título o autor..."
+                                                 styleClass="filter-input"/>
+                                </div>
+                                <p:selectOneMenu value="#{adminBean.filtroCategoriaIdLibros}" styleClass="filter-select">
+                                    <f:selectItem itemLabel="Todas las categorías" noSelectionOption="true"/>
+                                    <f:selectItems value="#{adminBean.categorias}" var="cat"
+                                                   itemLabel="#{cat.nombre}" itemValue="#{cat.id}"/>
+                                </p:selectOneMenu>
+                                <p:commandButton value="Buscar" icon="pi pi-search"
+                                                 action="#{adminBean.buscarLibros()}"
+                                                 update=":tablaAdmin :mensajesAdmin"
+                                                 styleClass="btn-primary" style="height:40px !important;"/>
+                                <p:commandButton value="Limpiar" icon="pi pi-times"
+                                                 action="#{adminBean.limpiarFiltrosLibros()}"
+                                                 update="@form :tablaAdmin :mensajesAdmin"
+                                                 styleClass="btn-secondary" style="height:40px !important;"/>
+                            </div>
+                        </h:form>
+
+                        <h:form id="tablaAdmin">
+
+                            <p:dataTable value="#{adminBean.listaLibros}" var="libro"
+                                         paginator="true" rows="10"
+                                         styleClass="admin-table"
+                                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         currentPageReportTemplate="{currentPage} de {totalPages}"
+                                         rowsPerPageTemplate="10,25,50"
+                                         emptyMessage="No hay libros registrados."
+                                         sortMode="multiple">
+
+                                <p:column headerText="Estado" style="width:10%; text-align:center;">
+                                    <p:commandLink action="#{adminBean.alternarEstadoLibro}"
+                                                   update="tablaAdmin :mensajesAdmin"
+                                                   title="#{libro.activo ? 'Desactivar libro' : 'Activar libro'}"
+                                                   styleClass="toggle-switch #{libro.activo ? 'toggle-on' : 'toggle-off'}">
+                                        <f:setPropertyActionListener value="#{libro}" target="#{adminBean.libroSeleccionado}"/>
+                                        <p:confirm header="#{libro.activo ? 'Desactivar libro' : 'Activar libro'}"
+                                                   message="#{libro.activo ? 'El libro dejara de estar activo para nuevas operaciones. Deseas continuar?' : 'El libro volvera a estar activo para nuevas operaciones. Deseas continuar?'}"
+                                                   icon="pi pi-exclamation-triangle"/>
+                                        <span class="toggle-track">
+                                            <span class="toggle-thumb"/>
+                                        </span>
+                                    </p:commandLink>
+                                </p:column>
+
+                                <p:column headerText="Título" sortBy="#{libro.titulo}" style="width:28%">
+                                    <div class="cell-title">
+                                        <span class="cell-text">#{libro.titulo}</span>
+                                    </div>
+                                </p:column>
+                                <p:column headerText="Autor" sortBy="#{libro.autor}" style="width:18%">
+                                    #{libro.autor}
+                                </p:column>
+                                <p:column headerText="Categoría" sortBy="#{libro.categoria.nombre}" style="width:13%">
+                                    <span class="cell-badge">#{libro.categoria.nombre}</span>
+                                </p:column>
+                                <p:column headerText="Stock" sortBy="#{libro.stockTotal}" style="width:8%; text-align:center;">
+                                    <span class="cell-stock">#{libro.stockTotal}</span>
+                                </p:column>
+                                <p:column headerText="Acciones" style="width:23%; text-align:center;">
+                                    <div class="cell-actions">
+                                        <p:commandButton value="Editar" icon="pi pi-pencil"
+                                                         action="#{adminBean.editarLibro(libro)}"
+                                                         update=":dlgEditor"
+                                                         oncomplete="PF('dlgEditor').show()"
+                                                         styleClass="btn-edit"/>
+                                        <p:commandButton value="Eliminar" icon="pi pi-trash"
+                                                         action="#{adminBean.prepararEliminar(libro)}"
+                                                         update=":dlgEliminar"
+                                                         oncomplete="PF('dlgEliminar').show()"
+                                                         styleClass="btn-delete"/>
+                                    </div>
+                                </p:column>
+                            </p:dataTable>
+                        </h:form>
+                    </div>
+                </h:panelGroup>
+
+                <!-- ============ SECCIÓN 2: PRÉSTAMOS ACTIVOS ============ -->
+                <h:panelGroup rendered="#{adminBean.seccion == 'prestamos'}" layout="block">
+                    <div class="admin-card">
+                        <div class="table-header-bar">
+                            <h2 class="admin-card-header" style="margin-bottom:0; padding-bottom:0; border-bottom:none;">
+                                <span class="admin-card-icon"><i class="pi pi-bookmark"/></span>
+                                Préstamos Activos
+                            </h2>
+                            <span class="table-count">#{adminBean.prestamosActivos.size()} activo(s)</span>
+                        </div>
+
+                        <h:form id="formFiltrosPrestamos">
+                            <div class="filter-bar">
+                                <div class="filter-input-group">
+                                    <i class="pi pi-search filter-input-icon"/>
+                                    <p:inputText value="#{adminBean.keywordPrestamos}" placeholder="Buscar por título, autor o usuario..."
+                                                 styleClass="filter-input"/>
+                                </div>
+                                <p:selectOneMenu value="#{adminBean.filtroCategoriaId}" styleClass="filter-select">
+                                    <f:selectItem itemLabel="Todas las categorías" noSelectionOption="true"/>
+                                    <f:selectItems value="#{adminBean.categorias}" var="cat"
+                                                   itemLabel="#{cat.nombre}" itemValue="#{cat.id}"/>
+                                </p:selectOneMenu>
+                                <p:selectBooleanCheckbox value="#{adminBean.filtroConStock}" itemLabel="Con stock"/>
+                                <p:commandButton value="Buscar" icon="pi pi-search"
+                                                 action="#{adminBean.buscarPrestamos()}"
+                                                 update=":formPrestamosActivos:tablaPrestamosActivos :mensajesAdmin"
+                                                 styleClass="btn-primary" style="height:40px !important;"/>
+                                <p:commandButton value="Limpiar" icon="pi pi-times"
+                                                 action="#{adminBean.limpiarFiltros()}"
+                                                 update="@form :formPrestamosActivos:tablaPrestamosActivos :mensajesAdmin"
+                                                 styleClass="btn-secondary" style="height:40px !important;"/>
+                            </div>
+                        </h:form>
+
+                        <h:form id="formPrestamosActivos">
+                            <p:dataTable id="tablaPrestamosActivos" value="#{adminBean.prestamosActivos}" var="p"
+                                         paginator="true" rows="10"
+                                         styleClass="admin-table"
+                                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         currentPageReportTemplate="{currentPage} de {totalPages}"
+                                         rowsPerPageTemplate="10,25,50"
+                                         emptyMessage="No hay préstamos activos."
+                                         sortMode="multiple">
+
+                                <p:column headerText="Libro" sortBy="#{p.libro.titulo}" style="width:25%">
+                                    <div class="cell-title">
+                                        <span class="cell-text">#{p.libro.titulo}</span>
+                                    </div>
+                                </p:column>
+                                <p:column headerText="Usuario" sortBy="#{p.usuario.nombre}" style="width:20%">
+                                    #{p.usuario.nombre}
+                                </p:column>
+                                <p:column headerText="Categoría" sortBy="#{p.libro.categoria.nombre}" style="width:13%">
+                                    <span class="cell-badge">#{p.libro.categoria.nombre}</span>
+                                </p:column>
+                                <p:column headerText="Préstamo" sortBy="#{p.fechaPrestamo}" style="width:15%">
+                                    <span class="cell-date">
+                                        <h:outputText value="#{p.fechaPrestamo}">
+                                            <f:convertDateTime pattern="dd/MM/yyyy" type="date"/>
+                                        </h:outputText>
+                                    </span>
+                                </p:column>
+                                <p:column headerText="Devolver antes" sortBy="#{p.fechaDevolucionEstimada}" style="width:18%">
+                                    <span class="cell-date">
+                                        <h:outputText value="#{p.fechaDevolucionEstimada}">
+                                            <f:convertDateTime pattern="dd/MM/yyyy" type="date"/>
+                                        </h:outputText>
+                                    </span>
+                                </p:column>
+                            </p:dataTable>
+                        </h:form>
+                    </div>
+                </h:panelGroup>
+
+                <!-- ============ SECCIÓN 3: DEVOLUCIONES PENDIENTES ============ -->
+                <h:panelGroup rendered="#{adminBean.seccion == 'devoluciones'}" layout="block">
+                    <div class="admin-card admin-card-overdue">
+                        <div class="table-header-bar">
+                            <h2 class="admin-card-header" style="margin-bottom:0; padding-bottom:0; border-bottom:none;">
+                                <span class="admin-card-icon-overdue"><i class="pi pi-exclamation-triangle"/></span>
+                                Devoluciones Pendientes
+                            </h2>
+                            <span class="table-count table-count-danger">#{adminBean.devolucionesPendientes.size()} pendiente(s)</span>
+                        </div>
+
+                        <h:form id="formDevoluciones">
+                            <p:dataTable value="#{adminBean.devolucionesPendientes}" var="p"
+                                         paginator="true" rows="10"
+                                         styleClass="admin-table admin-table-overdue"
+                                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         currentPageReportTemplate="{currentPage} de {totalPages}"
+                                         rowsPerPageTemplate="10,25,50"
+                                         emptyMessage="No hay devoluciones pendientes."
+                                         sortMode="multiple">
+
+                                <p:column headerText="Vencimiento" sortBy="#{p.fechaDevolucionEstimada}" style="width:12%; text-align:center;">
+                                    <div class="overdue-days">
+                                        <span class="overdue-days-num">#{adminBean.getDiasVencidos(p)}</span>
+                                        <span class="overdue-days-label">días</span>
+                                    </div>
+                                </p:column>
+                                <p:column headerText="Libro" sortBy="#{p.libro.titulo}" style="width:24%">
+                                    <div class="cell-title">
+                                        <span class="cell-text">#{p.libro.titulo}</span>
+                                    </div>
+                                </p:column>
+                                <p:column headerText="Usuario" sortBy="#{p.usuario.nombre}" style="width:20%">
+                                    #{p.usuario.nombre}
+                                </p:column>
+                                <p:column headerText="Categoría" sortBy="#{p.libro.categoria.nombre}" style="width:13%">
+                                    <span class="cell-badge cell-badge-danger">#{p.libro.categoria.nombre}</span>
+                                </p:column>
+                                <p:column headerText="Vencía el" sortBy="#{p.fechaDevolucionEstimada}" style="width:20%">
+                                    <span class="cell-date cell-date-danger">
+                                        <h:outputText value="#{p.fechaDevolucionEstimada}">
+                                            <f:convertDateTime pattern="dd/MM/yyyy" type="date"/>
+                                        </h:outputText>
+                                    </span>
+                                </p:column>
+                            </p:dataTable>
+                        </h:form>
+                    </div>
+                </h:panelGroup>
+
+                </h:panelGroup>
+            </h:panelGroup>
+            </section>
+
+
+            <div class="admin-footer-link">
+                <a href="/sistema-gestion-biblioteca/admin/index.xhtml" class="btn-ghost-admin">Volver al panel</a>
             </div>
         </div>
 
-        <div class="admin-container">
-            <h1 class="page-title" style="margin-bottom:24px; color:#FFFFFF !important;">Panel de Administración</h1>
-
-            <h:form id="mensajesAdmin">
-                <p:messages showDetail="true"/>
-            </h:form>
-
-            <!-- ===== CRUD ===== -->
-            <div class="admin-card">
-                <h2 class="admin-card-header">
-                    <i class="pi pi-pencil" style="color:#C9A96E; font-size:1.2rem;"></i>
-                    #{adminBean.libroEdicion.id == null ? 'Nuevo Libro' : 'Editar Libro'}
-                </h2>
-
-                <h:form id="formLibro">
-                    <div class="crud-layout">
-
-                        <!-- Columna izquierda: Preview -->
-                        <div class="crud-preview">
+        <!-- ===== MODAL: CREAR LIBRO ===== -->
+        <h:form id="dlgCrear">
+            <p:dialog id="dlgCrearWidget" widgetVar="dlgCrearWidget"
+                      header="Registrar Nuevo Libro"
+                      width="900" modal="true" closable="true" resizable="false"
+                      showEffect="fade" hideEffect="fade"
+                      styleClass="modal-admin"
+                      onHide="#{adminBean.cerrarEditor()}">
+                <div class="modal-admin-body">
+                    <div class="crud-layout" style="gap:28px;">
+                        <div class="crud-preview" style="position:static; top:auto;">
                             <div class="crud-preview-label">Vista Previa</div>
-                            <h:panelGroup id="previewPanel" layout="block">
+                            <h:panelGroup id="previewCrearPanel" layout="block">
                                 <div class="preview-card">
                                     <div class="preview-cover">
                                         <h:graphicImage value="#{adminBean.libroEdicion.imagen}"
@@ -74,217 +384,130 @@
                                             <span>#{adminBean.libroEdicion.anioPublicacion != null ? adminBean.libroEdicion.anioPublicacion : 'Año'}</span>
                                             <span>#{adminBean.libroEdicion.paginas != null ? adminBean.libroEdicion.paginas : '---'} pág.</span>
                                         </div>
-                                        <div class="preview-desc">
-                                            #{empty adminBean.libroEdicion.descripcion ? 'El resumen del libro aparecerá aquí...' : adminBean.libroEdicion.descripcion}
-                                        </div>
                                     </div>
                                     <div class="preview-footer">
-                                        <span style="font-size:0.75rem; font-weight:600; color:#1B3A4B;">
-                                            Stock: #{adminBean.libroEdicion.stockTotal > 0 ? adminBean.libroEdicion.stockTotal : '—'}
-                                        </span>
-                                        <span style="font-size:0.7rem; color:#9E9E9E; font-weight:500;">
-                                            #{empty adminBean.libroEdicion.idioma ? '—' : adminBean.libroEdicion.idioma}
-                                        </span>
+                                        <span class="preview-stock">Stock: #{adminBean.libroEdicion.stockTotal > 0 ? adminBean.libroEdicion.stockTotal : '—'}</span>
+                                        <span class="preview-idioma">#{empty adminBean.libroEdicion.idioma ? '—' : adminBean.libroEdicion.idioma}</span>
                                     </div>
                                 </div>
                             </h:panelGroup>
                         </div>
-
-                        <!-- Columna derecha: Formulario -->
-                        <div class="crud-form">
-                            <div class="crud-form-section">Información del libro</div>
-
+                        <div class="crud-form" style="gap:12px;">
+                            <div class="form-section">
+                                <div class="form-section-title"><i class="pi pi-info-circle"/> Información</div>
+                                <div class="admin-form-group">
+                                    <label>Título <span class="required">*</span></label>
+                                    <p:inputText id="tituloCrear" value="#{adminBean.libroEdicion.titulo}" required="true"
+                                                 placeholder="Ej: Clean Code">
+                                        <p:ajax event="keyup" update="previewCrearPanel"/>
+                                    </p:inputText>
+                                </div>
+                                <div class="form-row-2col">
+                                    <div class="admin-form-group">
+                                        <label>Autor <span class="required">*</span></label>
+                                        <p:inputText id="autorCrear" value="#{adminBean.libroEdicion.autor}" required="true"
+                                                     placeholder="Ej: Robert C. Martin">
+                                            <p:ajax event="keyup" update="previewCrearPanel"/>
+                                        </p:inputText>
+                                    </div>
+                                    <div class="admin-form-group">
+                                        <label>ISBN</label>
+                                        <p:inputText id="isbnCrear" value="#{adminBean.libroEdicion.isbn}" placeholder="978-..."/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-section">
+                                <div class="form-section-title"><i class="pi pi-tag"/> Clasificación</div>
+                                <div class="form-row-2col">
+                                    <div class="admin-form-group">
+                                        <label>Categoría <span class="required">*</span></label>
+                                        <p:selectOneMenu id="catCrear" value="#{adminBean.libroEdicion.categoria}"
+                                                         converter="categoriaConverter" style="width:100%;">
+                                            <f:selectItem itemLabel="Seleccione..." noSelectionOption="true"/>
+                                            <f:selectItems value="#{adminBean.categorias}" var="cat"
+                                                           itemLabel="#{cat.nombre}" itemValue="#{cat}"/>
+                                            <p:ajax event="change" update="previewCrearPanel"/>
+                                        </p:selectOneMenu>
+                                    </div>
+                                    <div class="admin-form-group">
+                                        <label>Stock <span class="required">*</span></label>
+                                        <p:inputText id="stockCrear" value="#{adminBean.libroEdicion.stockTotal}" required="true"
+                                                     placeholder="Ej: 10">
+                                            <p:ajax event="keyup" update="previewCrearPanel"/>
+                                        </p:inputText>
+                                    </div>
+                                </div>
+                                <div class="form-row-2col" style="margin-top:12px;">
+                                    <div class="admin-form-group" style="grid-column:1/-1;">
+                                        <label>Días de préstamo</label>
+                                        <p:inputText id="diasEditar" value="#{adminBean.libroEdicion.diasPrestamo}"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-section">
+                                <div class="form-section-title"><i class="pi pi-bookmark"/> Detalles editoriales</div>
+                                <div class="form-row-2col">
+                                    <div class="admin-form-group">
+                                        <label>Editorial</label>
+                                        <p:inputText id="editorialCrear" value="#{adminBean.libroEdicion.editorial}"
+                                                     placeholder="Ej: O'Reilly">
+                                            <p:ajax event="keyup" update="previewCrearPanel"/>
+                                        </p:inputText>
+                                    </div>
+                                    <div class="admin-form-group">
+                                        <label>Año</label>
+                                        <p:inputText id="anioCrear" value="#{adminBean.libroEdicion.anioPublicacion}"
+                                                     placeholder="Ej: 2024">
+                                            <p:ajax event="keyup" update="previewCrearPanel"/>
+                                        </p:inputText>
+                                    </div>
+                                </div>
+                                <div class="form-row-2col">
+                                    <div class="admin-form-group">
+                                        <label>Páginas</label>
+                                        <p:inputText id="paginasCrear" value="#{adminBean.libroEdicion.paginas}" placeholder="Ej: 450"/>
+                                    </div>
+                                    <div class="admin-form-group">
+                                        <label>Idioma</label>
+                                        <p:inputText id="idiomaCrear" value="#{adminBean.libroEdicion.idioma}" placeholder="Ej: Español"/>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="admin-form-group">
-                                <p:outputLabel for="titulo" value="Título"/>
-                                <p:inputText id="titulo" value="#{adminBean.libroEdicion.titulo}" required="true"
-                                             placeholder="Ej: Introducción a la Programación">
-                                    <p:ajax event="keyup" update="previewPanel"/>
+                                <label>URL de imagen</label>
+                                <p:inputText id="imagenCrear" value="#{adminBean.libroEdicion.imagen}"
+                                             placeholder="https://...">
+                                    <p:ajax event="keyup" update="previewCrearPanel"/>
                                 </p:inputText>
                             </div>
-
-                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-                                <div class="admin-form-group">
-                                    <p:outputLabel for="autor" value="Autor"/>
-                                    <p:inputText id="autor" value="#{adminBean.libroEdicion.autor}" required="true"
-                                                 placeholder="Ej: Robert C. Martin">
-                                        <p:ajax event="keyup" update="previewPanel"/>
-                                    </p:inputText>
-                                </div>
-                                <div class="admin-form-group">
-                                    <p:outputLabel for="isbn" value="ISBN"/>
-                                    <p:inputText id="isbn" value="#{adminBean.libroEdicion.isbn}"
-                                                 placeholder="978-..."/>
-                                </div>
-                            </div>
-
-                            <div class="crud-form-section">Clasificación</div>
-
-                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-                                <div class="admin-form-group">
-                                    <p:outputLabel for="categoria" value="Categoría"/>
-                                    <p:selectOneMenu id="categoria" value="#{adminBean.libroEdicion.categoria}"
-                                                     converter="categoriaConverter" style="width:100%;">
-                                        <f:selectItem itemLabel="Seleccione..." noSelectionOption="true"/>
-                                        <f:selectItems value="#{adminBean.categorias}" var="cat"
-                                                       itemLabel="#{cat.nombre}" itemValue="#{cat}"/>
-                                        <p:ajax event="change" update="previewPanel"/>
-                                    </p:selectOneMenu>
-                                </div>
-                                <div class="admin-form-group">
-                                    <p:outputLabel for="stock" value="Stock Total"/>
-                                    <p:inputText id="stock" value="#{adminBean.libroEdicion.stockTotal}" required="true"
-                                                 placeholder="Ej: 10">
-                                        <p:ajax event="keyup" update="previewPanel"/>
-                                    </p:inputText>
-                                </div>
-                            </div>
-
-                            <div class="crud-form-section">Detalles editoriales</div>
-
-                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-                                <div class="admin-form-group">
-                                    <p:outputLabel for="editorial" value="Editorial"/>
-                                    <p:inputText id="editorial" value="#{adminBean.libroEdicion.editorial}"
-                                                 placeholder="Ej: O'Reilly Media">
-                                        <p:ajax event="keyup" update="previewPanel"/>
-                                    </p:inputText>
-                                </div>
-                                <div class="admin-form-group">
-                                    <p:outputLabel for="anio" value="Año de publicación"/>
-                                    <p:inputText id="anio" value="#{adminBean.libroEdicion.anioPublicacion}"
-                                                 placeholder="Ej: 2024">
-                                        <p:ajax event="keyup" update="previewPanel"/>
-                                    </p:inputText>
-                                </div>
-                            </div>
-
-                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-                                <div class="admin-form-group">
-                                    <p:outputLabel for="paginas" value="Páginas"/>
-                                    <p:inputText id="paginas" value="#{adminBean.libroEdicion.paginas}"
-                                                 placeholder="Ej: 450">
-                                        <p:ajax event="keyup" update="previewPanel"/>
-                                    </p:inputText>
-                                </div>
-                                <div class="admin-form-group">
-                                    <p:outputLabel for="idioma" value="Idioma"/>
-                                    <p:inputText id="idioma" value="#{adminBean.libroEdicion.idioma}"
-                                                 placeholder="Ej: Español">
-                                        <p:ajax event="keyup" update="previewPanel"/>
-                                    </p:inputText>
-                                </div>
-                            </div>
-
-                            <div class="crud-form-section">Portada y descripción</div>
-
                             <div class="admin-form-group">
-                                <p:outputLabel for="imagen" value="URL de la imagen"/>
-                                <p:inputText id="imagen" value="#{adminBean.libroEdicion.imagen}"
-                                             placeholder="https://... o /cover/...">
-                                    <p:ajax event="keyup" update="previewPanel"/>
-                                </p:inputText>
+                                <label>Resumen</label>
+                                <p:inputTextarea id="descCrear" value="#{adminBean.libroEdicion.descripcion}"
+                                                 rows="2" placeholder="Breve descripción..."
+                                                 style="resize:vertical; min-height:60px;"/>
                             </div>
-
-                            <div class="admin-form-group">
-                                <p:outputLabel for="descripcion" value="Resumen / Descripción"/>
-                                <p:inputTextarea id="descripcion" value="#{adminBean.libroEdicion.descripcion}"
-                                                 rows="3" placeholder="Breve descripción del libro..."
-                                                 style="resize:vertical; min-height:80px;">
-                                    <p:ajax event="keyup" update="previewPanel"/>
-                                </p:inputTextarea>
-                            </div>
-
-                            <div style="display:flex; gap:12px; margin-top:8px;">
-                                <p:commandButton value="Guardar Libro" action="#{adminBean.guardarLibro()}"
-                                                 update="tablaAdmin mensajesAdmin formLibro" styleClass="btn-primary"
-                                                 icon="pi pi-check"/>
-                                <p:commandButton value="Cancelar" action="#{adminBean.cancelarEdicion()}"
-                                                 update="formLibro" immediate="true" styleClass="btn-secondary"/>
+                            <div class="form-actions" style="margin-top:4px;">
+                                <p:commandButton value="Registrar Libro" icon="pi pi-check"
+                                                 action="#{adminBean.crearLibro()}"
+                                                 update="tablaAdmin mensajesAdmin"
+                                                 oncomplete="PF('dlgCrearWidget').hide()"
+                                                 styleClass="btn-primary"/>
+                                <p:commandButton value="Cancelar" icon="pi pi-times"
+                                                 onclick="PF('dlgCrearWidget').hide()"
+                                                 styleClass="btn-secondary" immediate="true"/>
                             </div>
                         </div>
-
                     </div>
-                </h:form>
-            </div>
+                </div>
+            </p:dialog>
+        </h:form>
 
-            <!-- ===== TABLA ===== -->
-            <div class="admin-card">
-                <h2 class="admin-card-header">
-                    <i class="pi pi-list" style="color:#C9A96E; font-size:1.2rem;"></i>
-                    Libros Registrados
-                </h2>
+        <ui:include src="/WEB-INF/includes/modales-admin.xhtml"/>
 
-                <h:form id="tablaAdmin">
-                    <p:dataTable value="#{adminBean.listaLibros}" var="libro"
-                                 paginator="true" rows="10"
-                                 styleClass="admin-table"
-                                 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                 rowsPerPageTemplate="10,25,50">
-                        <p:column headerText="Título" sortBy="#{libro.titulo}">
-                            #{libro.titulo}
-                        </p:column>
-                        <p:column headerText="Autor" sortBy="#{libro.autor}">
-                            #{libro.autor}
-                        </p:column>
-                        <p:column headerText="Categoría" sortBy="#{libro.categoria.nombre}">
-                            #{libro.categoria.nombre}
-                        </p:column>
-                        <p:column headerText="Stock" sortBy="#{libro.stockTotal}">
-                            #{libro.stockTotal}
-                        </p:column>
-                        <p:column headerText="Acciones">
-                            <div class="col-actions">
-                                <p:commandButton value="Editar" action="#{adminBean.editarLibro(libro)}"
-                                                 update="formLibro mensajesAdmin" styleClass="btn-edit"/>
-                                <p:commandButton value="Eliminar" action="#{adminBean.eliminarLibro(libro.id)}"
-                                                 update="tablaAdmin mensajesAdmin" styleClass="btn-danger"
-                                                 onclick="return confirm('¿Eliminar este libro?')"/>
-                            </div>
-                        </p:column>
-                    </p:dataTable>
-                </h:form>
-            </div>
-
-            <!-- ===== DEVOLUCIONES ===== -->
-            <div class="admin-card">
-                <h2 class="admin-card-header">
-                    <i class="pi pi-undo" style="color:#C9A96E; font-size:1.2rem;"></i>
-                    Devoluciones Pendientes
-                </h2>
-
-                <h:form id="formDevoluciones">
-                    <p:dataTable value="#{adminBean.prestamosVencidos}" var="p"
-                                 emptyMessage="No hay préstamos vencidos."
-                                 styleClass="admin-table">
-                        <p:column headerText="Libro">
-                            #{p.libro.titulo}
-                        </p:column>
-                        <p:column headerText="Usuario">
-                            #{p.usuario.nombre}
-                        </p:column>
-                        <p:column headerText="Vencía">
-                            #{p.fechaDevolucionEstimada}
-                        </p:column>
-                        <p:column headerText="Acción">
-                            <p:commandButton value="Registrar Devolución"
-                                             action="#{adminBean.registrarDevolucion()}"
-                                             update="formDevoluciones tablaAdmin mensajesAdmin"
-                                             styleClass="btn-primary"
-                                             icon="pi pi-check">
-                                <f:setPropertyActionListener value="#{p.id}" target="#{adminBean.prestamoIdDevolucion}"/>
-                            </p:commandButton>
-                        </p:column>
-                    </p:dataTable>
-                </h:form>
-            </div>
-
-            <div style="text-align:center; margin: 24px 0 48px;">
-                <a href="/sistema-gestion-biblioteca/index.xhtml" class="btn-ghost">← Volver al inicio</a>
-            </div>
-
-        </div>
+        <h:panelGroup id="libros" style="display:none;"/>
+        <h:panelGroup id="formMsgs" style="display:none;"/>
 
     </h:panelGroup>
 
-</h:body>
-</html>
+</ui:define>
+</ui:composition>

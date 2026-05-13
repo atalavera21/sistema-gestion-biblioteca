@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<h:head>
+    <title><ui:insert name="titulo">Biblioteca SENATI</ui:insert></title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+    <h:outputStylesheet library="css" name="estilos.css"/>
+</h:head>
+<h:body>
+
+    <!-- ================================================================ -->
+    <!-- NAVBAR MODERNO                                                     -->
+    <!-- ================================================================ -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="/sistema-gestion-biblioteca/index.xhtml" class="navbar-brand">
+                <span class="navbar-logo">
+                    <i class="pi pi-book"></i>
+                </span>
+                <span class="navbar-name">
+                    <span class="navbar-name-main">Biblioteca</span>
+                    <span class="navbar-name-sub">SENATI</span>
+                </span>
+            </a>
+
+            <div class="navbar-links">
+                <a href="/sistema-gestion-biblioteca/catalogo.xhtml" class="navbar-link">
+                    <i class="pi pi-search"></i> Catálogo
+                </a>
+
+                <h:panelGroup rendered="#{authBean.autenticado and authBean.rol == 'ESTUDIANTE'}">
+                    <a href="/sistema-gestion-biblioteca/prestamos.xhtml" class="navbar-link">
+                        <i class="pi pi-bookmark"></i> Mis Préstamos
+                    </a>
+                </h:panelGroup>
+
+                <h:panelGroup rendered="#{authBean.autenticado and authBean.rol == 'ADMIN'}">
+                    <a href="/sistema-gestion-biblioteca/admin/index.xhtml" class="navbar-link">
+                        <i class="pi pi-cog"></i> Administrar
+                    </a>
+                </h:panelGroup>
+            </div>
+
+            <div class="navbar-actions">
+                <!-- Campanita de notificaciones (solo estudiante) -->
+                <h:panelGroup rendered="#{authBean.autenticado and authBean.rol == 'ESTUDIANTE'}">
+                    <h:form id="formNotif" style="display:contents;">
+                        <p:commandLink id="bellBtn" styleClass="navbar-bell"
+                                       update="@form :dlgNotificaciones"
+                                       oncomplete="if(PF('dlgNotifWidget').isVisible()){PF('dlgNotifWidget').hide();}else{PF('dlgNotifWidget').show();}"
+                                       action="#{notificacionBean.cargarNotificaciones()}">
+                            <i class="pi pi-bell"></i>
+                            <h:panelGroup rendered="#{notificacionBean.hayNotificaciones}"
+                                          layout="block" styleClass="bell-badge">
+                                #{notificacionBean.conteo}
+                            </h:panelGroup>
+                        </p:commandLink>
+                    </h:form>
+                </h:panelGroup>
+
+                <!-- Usuario autenticado -->
+                <h:panelGroup rendered="#{authBean.autenticado}">
+                    <div class="navbar-user">
+                        <div class="navbar-avatar">
+                            #{authBean.codigo.substring(0,2).toUpperCase()}
+                        </div>
+                        <span class="navbar-username">#{authBean.codigo}</span>
+                        <h:form style="display:contents;">
+                            <h:commandButton styleClass="navbar-logout" value="Salir"
+                                             action="#{authBean.logout()}"/>
+                        </h:form>
+                    </div>
+                </h:panelGroup>
+
+                <!-- No autenticado -->
+                <h:panelGroup rendered="#{not authBean.autenticado}">
+                    <a href="/sistema-gestion-biblioteca/index.xhtml" class="navbar-login-btn">
+                        <i class="pi pi-sign-in"></i> Iniciar Sesión
+                    </a>
+                </h:panelGroup>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ================================================================ -->
+    <!-- PANEL DE NOTIFICACIONES (overlay)                                 -->
+    <!-- ================================================================ -->
+    <h:form id="dlgNotificaciones">
+        <p:overlayPanel id="dlgNotifWidget" widgetVar="dlgNotifWidget"
+                        for=":formNotif:bellBtn" my="right top" at="right bottom"
+                        styleClass="notif-panel" showEffect="fade" hideEffect="fade">
+            <div class="notif-panel-header">
+                <i class="pi pi-bell"></i> Notificaciones
+                <span class="notif-panel-count">#{notificacionBean.conteo}</span>
+            </div>
+
+            <!-- VENCIDOS -->
+            <h:panelGroup rendered="#{notificacionBean.hayVencidos}" layout="block">
+                <div class="notif-section-label">Vencidos</div>
+                <ui:repeat value="#{notificacionBean.vencidos}" var="n">
+                    <div class="notif-item">
+                        <span class="notif-icon-overdue"><i class="pi pi-exclamation-triangle"></i></span>
+                        <div class="notif-item-info">
+                            <span class="notif-item-title">#{n.libro.titulo}</span>
+                            <span class="notif-item-meta">
+                                #{notificacionBean.getEtiqueta(n)} · venció
+                                <h:outputText value="#{n.fechaDevolucionEstimada}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy" type="date"/>
+                                </h:outputText>
+                            </span>
+                        </div>
+                        <span class="notif-badge notif-badge-overdue">#{notificacionBean.getBadge(n)}</span>
+                    </div>
+                </ui:repeat>
+            </h:panelGroup>
+
+            <!-- POR VENCER -->
+            <h:panelGroup rendered="#{notificacionBean.hayPorVencer}" layout="block">
+                <div class="notif-section-label">Por vencer</div>
+                <ui:repeat value="#{notificacionBean.porVencer}" var="n">
+                    <div class="notif-item">
+                        <span class="notif-icon-soon"><i class="pi pi-clock"></i></span>
+                        <div class="notif-item-info">
+                            <span class="notif-item-title">#{n.libro.titulo}</span>
+                            <span class="notif-item-meta">
+                                #{notificacionBean.getEtiqueta(n)} ·
+                                <h:outputText value="#{n.fechaDevolucionEstimada}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy" type="date"/>
+                                </h:outputText>
+                            </span>
+                        </div>
+                        <span class="notif-badge notif-badge-soon">#{notificacionBean.getBadge(n)}</span>
+                    </div>
+                </ui:repeat>
+            </h:panelGroup>
+
+            <!-- RECOMENDADOS -->
+            <h:panelGroup rendered="#{notificacionBean.hayRecomendados}" layout="block">
+                <div class="notif-section-label">⭐ Mejor puntuados</div>
+                <ui:repeat value="#{notificacionBean.recomendados}" var="r">
+                    <div class="notif-item notif-item-recom">
+                        <span class="notif-icon-recom">
+                            <span style="font-size:0.7rem; font-weight:700; color:#C9A96E;">#{r.puntuacion}</span>
+                        </span>
+                        <div class="notif-item-info">
+                            <span class="notif-item-title">#{r.titulo}</span>
+                            <span class="notif-item-meta">#{r.autor}</span>
+                        </div>
+                    </div>
+                </ui:repeat>
+            </h:panelGroup>
+
+            <h:panelGroup rendered="#{empty notificacionBean.notificaciones and not notificacionBean.hayRecomendados}" layout="block">
+                <div class="notif-empty">
+                    <i class="pi pi-check-circle"></i>
+                    <p>Todo al día</p>
+                </div>
+            </h:panelGroup>
+
+            <div class="notif-panel-footer">
+                <a href="/sistema-gestion-biblioteca/prestamos.xhtml" class="notif-see-all">
+                    Mis préstamos <i class="pi pi-arrow-right"></i>
+                </a>
+            </div>
+        </p:overlayPanel>
+    </h:form>
+
+    <!-- ================================================================ -->
+    <!-- CONTENIDO DE LA PÁGINA                                           -->
+    <!-- ================================================================ -->
+    <div class="page-content">
+        <ui:insert name="contenido">
+            <!-- El contenido específico de cada página va aquí -->
+        </ui:insert>
+    </div>
+
+    <!-- ================================================================ -->
+    <!-- FOOTER FIJO                                                       -->
+    <!-- ================================================================ -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <span class="footer-decor">✦</span>
+            <span class="footer-text">Desarrollado por Adrián Talavera</span>
+            <span class="footer-decor">✦</span>
+        </div>
+    </footer>
+
+</h:body>
+</html>

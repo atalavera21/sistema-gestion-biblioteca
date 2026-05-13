@@ -52,8 +52,20 @@ public class Libro {
     @Column(nullable = false)
     private int stockTotal;
 
+    @Column(name = "dias_prestamo", nullable = false)
+    private int diasPrestamo = 14;
+
+    @Column(nullable = false)
+    private boolean activo = true;
+
     @OneToMany(mappedBy = "libro", fetch = FetchType.LAZY)
     private List<Prestamo> prestamos = new ArrayList<>();
+
+    @Transient
+    private Double puntuacion;
+
+    @Transient
+    private Integer totalValoraciones;
 
     public Libro() {}
 
@@ -91,6 +103,18 @@ public class Libro {
 
     public int getStockTotal() { return stockTotal; }
     public void setStockTotal(int stockTotal) { this.stockTotal = stockTotal; }
+
+    public int getDiasPrestamo() { return diasPrestamo; }
+    public void setDiasPrestamo(int diasPrestamo) { this.diasPrestamo = diasPrestamo; }
+
+    public boolean isActivo() { return activo; }
+    public void setActivo(boolean activo) { this.activo = activo; }
+
+    public Double getPuntuacion() { return puntuacion; }
+    public void setPuntuacion(Double puntuacion) { this.puntuacion = puntuacion; }
+
+    public Integer getTotalValoraciones() { return totalValoraciones; }
+    public void setTotalValoraciones(Integer totalValoraciones) { this.totalValoraciones = totalValoraciones; }
 
     public List<Prestamo> getPrestamos() { return prestamos; }
 }

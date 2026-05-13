@@ -1,83 +1,144 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
-<h:head>
-    <title>Mis Préstamos — Biblioteca SENATI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
-    <h:outputStylesheet library="css" name="estilos.css"/>
-</h:head>
-<h:body>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/templates/plantilla.xhtml">
+<ui:define name="titulo">Mis Préstamos — Biblioteca SENATI</ui:define>
+<ui:define name="contenido">
 
-    <!-- Barra de sesion -->
-    <h:form>
-        <p:toolbar style="max-width:900px; margin: 10px auto;">
-            <p:toolbarGroup align="left">
-                <h:outputText value="📚 Biblioteca SENATI"/>
-            </p:toolbarGroup>
-            <p:toolbarGroup align="right">
-                <p:outputLabel value="Bienvenido, #{authBean.codigo}" rendered="#{authBean.autenticado}" style="margin-right:10px; font-weight:bold;"/>
-                <p:commandButton value="Cerrar Sesion" action="#{authBean.logout()}"
-                                 rendered="#{authBean.autenticado}" styleClass="ui-button-danger"/>
-            </p:toolbarGroup>
-        </p:toolbar>
-    </h:form>
+    <h:panelGroup rendered="#{not authBean.autenticado}">
+        <div class="access-denied">
+            <p>Acceso denegado.</p>
+            <p><a href="/sistema-gestion-biblioteca/index.xhtml">Iniciar sesión</a></p>
+        </div>
+    </h:panelGroup>
 
-    <p:panel header="Mis Préstamos" style="max-width:900px; margin: 20px auto;">
+    <h:panelGroup rendered="#{authBean.autenticado}">
+        <div class="prestamos-container">
+            <div class="prestamos-header">
+                <h1 class="page-title" style="color:#FFFFFF !important;">Mis Préstamos</h1>
+                <p class="admin-page-subtitle">Historial y estado de tus préstamos activos</p>
+            </div>
 
-        <!-- Prestamos activos -->
-        <p:fieldset legend="Prestamos Activos" toggleable="true">
-            <h:form>
-                <p:dataTable value="#{prestamoBean.prestamosActivos}" var="p"
-                             emptyMessage="No tienes prestamos activos.">
-                    <p:column headerText="Libro">
-                        #{p.libro.titulo}
-                    </p:column>
-                    <p:column headerText="Fecha Prestamo">
-                        #{p.fechaPrestamo}
-                    </p:column>
-                    <p:column headerText="Devolver antes de">
-                        #{p.fechaDevolucionEstimada}
-                    </p:column>
-                    <p:column headerText="Estado">
-                        #{p.estado}
-                    </p:column>
-                </p:dataTable>
+            <h:form id="mensajesPrestamos">
+                <p:growl id="growlPrestamos" showDetail="true" life="4000"/>
             </h:form>
-        </p:fieldset>
 
-        <br/>
-
-        <!-- Historial -->
-        <p:fieldset legend="Historial de Prestamos" toggleable="true" collapsed="true">
-            <h:form>
-                <p:dataTable value="#{prestamoBean.historial}" var="p"
-                             emptyMessage="No tienes historial de prestamos.">
-                    <p:column headerText="Libro">
-                        #{p.libro.titulo}
-                    </p:column>
-                    <p:column headerText="Fecha Prestamo">
-                        #{p.fechaPrestamo}
-                    </p:column>
-                    <p:column headerText="Devolucion Real">
-                        #{p.fechaDevolucionReal}
-                    </p:column>
-                    <p:column headerText="Estado">
-                        #{p.estado}
-                    </p:column>
-                </p:dataTable>
+            <h:form id="formConfirmacionPrestamos">
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade"
+                                 responsive="true" width="420" styleClass="confirm-dialog">
+                    <p:commandButton value="Confirmar" type="button"
+                                     styleClass="ui-confirmdialog-yes btn-primary" icon="pi pi-check"/>
+                    <p:commandButton value="Cancelar" type="button"
+                                     styleClass="ui-confirmdialog-no btn-secondary" icon="pi pi-times"/>
+                </p:confirmDialog>
             </h:form>
-        </p:fieldset>
 
-        <br/>
-        <h:form>
-            <p:panelGrid columns="3" style="margin: 0 auto;">
-                <p:button value="Catálogo" outcome="/catalogo"/>
-                <p:button value="Cerrar Sesión" outcome="/login"/>
-            </p:panelGrid>
-        </h:form>
+            <!-- Préstamos Activos -->
+            <div class="admin-card">
+                <h2 class="admin-card-header">
+                    <span class="admin-card-icon"><i class="pi pi-bookmark"></i></span>
+                    Préstamos Activos
+                </h2>
+                <h:form id="formPrestamosActivos">
+                    <p:dataTable value="#{prestamoBean.prestamosActivos}" var="p"
+                                 emptyMessage="No tienes préstamos activos."
+                                 styleClass="admin-table"
+                                 sortMode="multiple">
+                        <p:column headerText="Libro" sortBy="#{p.libro.titulo}" style="width:28%">
+                            <div class="cell-title"><span class="cell-text">#{p.libro.titulo}</span></div>
+                        </p:column>
+                        <p:column headerText="Fecha Préstamo" sortBy="#{p.fechaPrestamo}" style="width:18%">
+                            <span class="cell-date">
+                                <i class="pi pi-calendar" style="color:#1B3A4B; margin-right:6px; font-size:0.8rem;"/>
+                                <h:outputText value="#{p.fechaPrestamo}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy" type="date"/>
+                                </h:outputText>
+                            </span>
+                        </p:column>
+                        <p:column headerText="Devolver antes de" sortBy="#{p.fechaDevolucionEstimada}" style="width:18%">
+                            <span class="cell-date">
+                                <i class="pi pi-calendar-times" style="color:#C9A96E; margin-right:6px; font-size:0.8rem;"/>
+                                <h:outputText value="#{p.fechaDevolucionEstimada}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy" type="date"/>
+                                </h:outputText>
+                            </span>
+                        </p:column>
+                        <p:column headerText="Estado" style="width:16%">
+                            <span class="cell-estado estado-#{p.estado.toString().toLowerCase()}">#{p.estado}</span>
+                        </p:column>
+                        <p:column headerText="Acción" style="width:20%; text-align:center;">
+                            <p:commandButton value="Devolver" icon="pi pi-check"
+                                             action="#{prestamoBean.registrarDevolucion(p.id)}"
+                                             update="@form :mensajesPrestamos"
+                                             styleClass="btn-edit">
+                                <p:confirm header="Confirmar devolución"
+                                           message="¿Confirmas la devolución de '#{p.libro.titulo}'?"
+                                           icon="pi pi-exclamation-triangle"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+            </div>
 
-    </p:panel>
-</h:body>
-</html>
+            <!-- Historial -->
+            <div class="admin-card">
+                <h2 class="admin-card-header">
+                    <span class="admin-card-icon"><i class="pi pi-clock"></i></span>
+                    Historial de Préstamos
+                </h2>
+                <h:form>
+                    <p:dataTable value="#{prestamoBean.historial}" var="p"
+                                 emptyMessage="No tienes historial de préstamos."
+                                 styleClass="admin-table"
+                                 paginator="true" rows="10"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 currentPageReportTemplate="{currentPage} de {totalPages}"
+                                 sortMode="multiple">
+                        <p:column headerText="Libro" sortBy="#{p.libro.titulo}" style="width:25%">
+                            <div class="cell-title"><span class="cell-text">#{p.libro.titulo}</span></div>
+                        </p:column>
+                        <p:column headerText="Fecha Préstamo" sortBy="#{p.fechaPrestamo}" style="width:16%">
+                            <h:outputText value="#{p.fechaPrestamo}">
+                                <f:convertDateTime pattern="dd/MM/yyyy" type="date"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Devolución Real" sortBy="#{p.fechaDevolucionReal}" style="width:16%">
+                            <h:outputText value="#{p.fechaDevolucionReal}">
+                                <f:convertDateTime pattern="dd/MM/yyyy" type="date"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Estado" style="width:15%">
+                            <span class="cell-estado estado-#{p.estado.toString().toLowerCase()}">#{p.estado}</span>
+                        </p:column>
+                        <p:column headerText="Valoración" style="width:28%">
+                            <h:panelGroup rendered="#{p.estado == 'DEVUELTO' or p.estado == 'PENALIZADO'}" layout="block">
+                                <ui:repeat value="#{prestamoBean.estrellasValoracion(p.libro, authBean.codigo)}" var="e">
+                                    <p:commandLink action="#{prestamoBean.calificar(p.libro.id, e)}"
+                                                   update="@form :mensajesPrestamos"
+                                                   disabled="#{prestamoBean.yaValorado(p.libro.id, authBean.codigo)}"
+                                                   styleClass="rating-star-btn #{e le prestamoBean.ratingActual(p.libro.id, authBean.codigo) ? 'on' : ''}">
+                                        <i class="pi pi-star-fill" style="font-size:0.8rem; #{e le prestamoBean.ratingActual(p.libro.id, authBean.codigo) ? 'color:#EAB308;' : 'color:#4B5563;'}"></i>
+                                    </p:commandLink>
+                                </ui:repeat>
+                                <span style="font-family:Inter,sans-serif; font-size:0.65rem; color:#6b7796; margin-left:4px;">
+                                    #{prestamoBean.ratingActual(p.libro.id, authBean.codigo) gt 0 ? prestamoBean.ratingActual(p.libro.id, authBean.codigo).concat('/5') : '—'}
+                                </span>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{p.estado != 'DEVUELTO' and p.estado != 'PENALIZADO'}" layout="block">
+                                <span style="font-family:Inter,sans-serif; font-size:0.65rem; color:#4B5563;">Devuelve para valorar</span>
+                            </h:panelGroup>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+            </div>
+
+            <div class="admin-footer-link">
+                <a href="/sistema-gestion-biblioteca/catalogo.xhtml" class="btn-ghost-admin">← Volver al catálogo</a>
+            </div>
+        </div>
+    </h:panelGroup>
+
+</ui:define>
+</ui:composition>

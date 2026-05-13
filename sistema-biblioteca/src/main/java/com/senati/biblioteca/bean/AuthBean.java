@@ -16,18 +16,21 @@ public class AuthBean implements Serializable {
     @Inject
     private AuthService authService;
 
+    @Inject
+    private NotificacionBean notificacionBean;
+
     private String username;
     private String password;
 
     public String login() {
-        if (username == null || !username.endsWith("@senati.pe")) {
+        if (username == null || username.isBlank()) {
             FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Error", "El usuario debe terminar en @senati.pe"));
+                    "Error", "Ingrese su usuario."));
             return null;
         }
 
-        String usuarioSinDominio = username.split("@")[0];
+        String usuarioSinDominio = username.contains("@") ? username.split("@")[0] : username;
 
         if (authService.autenticar(usuarioSinDominio, password)) {
             HttpSession session = (HttpSession) FacesContext.getCurrentInstance()
@@ -38,8 +41,12 @@ public class AuthBean implements Serializable {
             String rol = authService.obtenerRol(usuarioSinDominio);
             session.setAttribute("rol", rol);
 
+            if ("ESTUDIANTE".equals(rol)) {
+                notificacionBean.cargarNotificaciones();
+            }
+
             if ("ADMIN".equals(rol)) {
-                return "/admin/libros?faces-redirect=true";
+                return "/admin/index?faces-redirect=true";
             }
             return "/catalogo?faces-redirect=true";
         }
@@ -54,7 +61,7 @@ public class AuthBean implements Serializable {
         HttpSession session = (HttpSession) FacesContext.getCurrentInstance()
             .getExternalContext().getSession(false);
         if (session != null) session.invalidate();
-        return "/login?faces-redirect=true";
+        return "/index?faces-redirect=true";
     }
 
     public boolean isAutenticado() {

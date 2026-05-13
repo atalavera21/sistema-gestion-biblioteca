@@ -1,0 +1,51 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/templates/plantilla.xhtml">
+<ui:define name="titulo">Administracion - Biblioteca SENATI</ui:define>
+<ui:define name="contenido">
+
+    <h:panelGroup rendered="#{not authBean.autenticado or authBean.rol != 'ADMIN'}">
+        <div class="access-denied">
+            <p>Acceso denegado.</p>
+            <p><a href="/sistema-gestion-biblioteca/index.xhtml">Iniciar sesion como administrador</a></p>
+        </div>
+    </h:panelGroup>
+
+    <h:panelGroup rendered="#{authBean.autenticado and authBean.rol == 'ADMIN'}">
+        <div class="admin-container admin-dashboard-page">
+
+            <div class="admin-page-header">
+                <div>
+                    <h1 class="page-title admin-page-title">Panel de Administracion</h1>
+                    <p class="admin-page-subtitle">Selecciona el modulo que vas a administrar.</p>
+                </div>
+            </div>
+
+            <div class="admin-menu-grid">
+                <a href="/sistema-gestion-biblioteca/admin/libros.xhtml" class="admin-menu-card">
+                    <span class="admin-menu-icon">
+                        <i class="pi pi-book"/>
+                    </span>
+                    <span class="admin-menu-content">
+                        <span class="admin-menu-title">Gestion de Libros</span>
+                        <span class="admin-menu-desc">Catalogo, prestamos activos y devoluciones pendientes</span>
+                    </span>
+                </a>
+
+                <a href="/sistema-gestion-biblioteca/admin/reportes.xhtml" class="admin-menu-card">
+                    <span class="admin-menu-icon" style="background:rgba(201,169,110,0.15);">
+                        <i class="pi pi-chart-bar" style="color:#C9A96E;"/>
+                    </span>
+                    <span class="admin-menu-content">
+                        <span class="admin-menu-title">Reportes</span>
+                        <span class="admin-menu-desc">Generar reportes en PDF y Excel</span>
+                    </span>
+                </a>
+            </div>
+
+        </div>
+    </h:panelGroup>
+
+</ui:define>
+</ui:composition>

@@ -42,6 +42,10 @@ public class LibroService {
         return libroDAO.buscarPorKeywordYCategoria(keyword, categoriaId);
     }
 
+    public List<Libro> buscarPorKeywordYCategoriaAdmin(String keyword, Long categoriaId) {
+        return libroDAO.buscarPorKeywordYCategoriaAdmin(keyword, categoriaId);
+    }
+
     public List<Libro> listarDisponibles() {
         List<Libro> todos = libroDAO.findAll();
         todos.removeIf(libro -> !isDisponible(libro));
@@ -53,8 +57,17 @@ public class LibroService {
         return activos < libro.getStockTotal();
     }
 
+    public long stockDisponible(Libro libro) {
+        long activos = prestamoDAO.countByLibroIdAndEstadoActivoVencido(libro.getId());
+        return Math.max(0, libro.getStockTotal() - activos);
+    }
+
     public List<Categoria> listarCategorias() {
         return categoriaDAO.findAll();
+    }
+
+    public List<Libro> listarMejorPuntuados(int limite) {
+        return libroDAO.findTopRated(limite);
     }
 
     public Libro crear(Libro libro) {
@@ -76,5 +89,12 @@ public class LibroService {
             throw new IllegalStateException("No se puede eliminar: hay " + activos + " prestamos activos.");
         }
         libroDAO.delete(libro);
+    }
+
+    public void alternarActivo(Long id) {
+        Libro libro = libroDAO.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Libro no encontrado."));
+        libro.setActivo(!libro.isActivo());
+        libroDAO.save(libro);
     }
 }

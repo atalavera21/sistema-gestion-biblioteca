@@ -95,6 +95,56 @@ public class PrestamoDAO {
             .getResultList();
     }
 
+    public List<Object[]> findLibrosPorCategoria(int limite) {
+        return em.createQuery(
+            "SELECT p.libro.categoria.nombre, COUNT(p) as total FROM Prestamo p GROUP BY p.libro.categoria.nombre ORDER BY total DESC",
+            Object[].class)
+            .setMaxResults(limite)
+            .getResultList();
+    }
+
+    public List<Prestamo> findPrestamosPenalizados() {
+        return em.createQuery(
+            "SELECT p FROM Prestamo p JOIN FETCH p.libro JOIN FETCH p.usuario WHERE p.estado = 'PENALIZADO' ORDER BY p.fechaDevolucionEstimada DESC",
+            Prestamo.class)
+            .getResultList();
+    }
+
+    public List<Prestamo> findAllActivos() {
+        return em.createQuery(
+            "SELECT p FROM Prestamo p JOIN FETCH p.libro JOIN FETCH p.usuario WHERE p.estado = 'ACTIVO' ORDER BY p.fechaPrestamo DESC",
+            Prestamo.class)
+            .getResultList();
+    }
+
+    public List<Prestamo> searchActivos(String keyword, Long categoriaId) {
+        StringBuilder jpql = new StringBuilder(
+            "SELECT DISTINCT p FROM Prestamo p JOIN FETCH p.libro JOIN FETCH p.usuario WHERE p.estado = 'ACTIVO'");
+        if (keyword != null && !keyword.isBlank()) {
+            jpql.append(" AND (LOWER(p.libro.titulo) LIKE :kw OR LOWER(p.libro.autor) LIKE :kw OR LOWER(p.usuario.nombre) LIKE :kw)");
+        }
+        if (categoriaId != null) {
+            jpql.append(" AND p.libro.categoria.id = :catId");
+        }
+        jpql.append(" ORDER BY p.fechaPrestamo DESC");
+
+        TypedQuery<Prestamo> query = em.createQuery(jpql.toString(), Prestamo.class);
+        if (keyword != null && !keyword.isBlank()) {
+            query.setParameter("kw", "%" + keyword.toLowerCase() + "%");
+        }
+        if (categoriaId != null) {
+            query.setParameter("catId", categoriaId);
+        }
+        return query.getResultList();
+    }
+
+    public List<Prestamo> findDevolucionesPendientes() {
+        return em.createQuery(
+            "SELECT p FROM Prestamo p JOIN FETCH p.libro JOIN FETCH p.usuario WHERE p.estado = 'VENCIDO' AND p.fechaDevolucionReal IS NULL ORDER BY p.fechaDevolucionEstimada ASC",
+            Prestamo.class)
+            .getResultList();
+    }
+
     public Prestamo save(Prestamo prestamo) {
         if (prestamo.getId() == null) {
             em.persist(prestamo);

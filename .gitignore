@@ -34,3 +34,8 @@ PROGRESO.md
 
 # Referencia local del PDF (optimizacion para agente)
 docs/PDSD-644_REQUISITOS.md
+
+# Carpetas locales (no viajan al repo)
+descargas/
+diseño/
+scripts/

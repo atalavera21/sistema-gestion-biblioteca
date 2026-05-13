@@ -32,6 +32,18 @@ public class Usuario {
     @Column(nullable = false)
     private boolean penalizado;
 
+    @Column(length = 255)
+    private String password;
+
+    @Column(length = 20, nullable = false)
+    private String rol = "ESTUDIANTE";
+
+    @Column(nullable = false)
+    private boolean activo = true;
+
+    @Column
+    private Double puntuacion = 50.0;
+
     @OneToMany(mappedBy = "usuario")
     private List<Prestamo> prestamos = new ArrayList<>();
 
@@ -53,6 +65,18 @@ public class Usuario {
 
     public boolean isPenalizado() { return penalizado; }
     public void setPenalizado(boolean penalizado) { this.penalizado = penalizado; }
+
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+
+    public String getRol() { return rol; }
+    public void setRol(String rol) { this.rol = rol; }
+
+    public boolean isActivo() { return activo; }
+    public void setActivo(boolean activo) { this.activo = activo; }
+
+    public Double getPuntuacion() { return puntuacion; }
+    public void setPuntuacion(Double puntuacion) { this.puntuacion = puntuacion; }
 
     public List<Prestamo> getPrestamos() { return prestamos; }
 }
