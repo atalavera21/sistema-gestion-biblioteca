@@ -4,6 +4,11 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 template="/WEB-INF/templates/plantilla.xhtml">
+
+<f:metadata>
+    <f:event type="preRenderView" listener="#{reporteBean.onLoad}"/>
+</f:metadata>
+
 <ui:define name="titulo">Reportes — Biblioteca SENATI</ui:define>
 <ui:define name="contenido">
 
@@ -15,122 +20,351 @@
     </h:panelGroup>
 
     <h:panelGroup rendered="#{authBean.autenticado and authBean.rol == 'ADMIN'}">
-        <div class="admin-container">
+        <div class="admin-container admin-gestion-page">
+
             <div class="admin-page-header">
-                <div>
-                    <h1 class="page-title admin-page-title">Panel de Reportes</h1>
-                    <p class="admin-page-subtitle">Generación de reportes en PDF y Excel</p>
+                <div class="admin-module-heading">
+                    <div class="admin-breadcrumb">
+                        <a href="/sistema-gestion-biblioteca/admin/index.xhtml">Panel de Administración</a>
+                        <i class="pi pi-angle-right"/>
+                        <span>Reportes</span>
+                    </div>
+                    <h1 class="page-title admin-page-title">Reportes y Análisis</h1>
+                    <p class="admin-page-subtitle">
+                        Cuatro indicadores clave de la biblioteca, con gráficos y exportación a PDF / Excel.
+                    </p>
                 </div>
             </div>
-            <h:form id="mensajesReportes">
-                <p:messages showDetail="true"/>
-            </h:form>
-            <div class="admin-nav">
+
+            <div class="admin-nav admin-nav-fullwidth">
                 <a href="/sistema-gestion-biblioteca/admin/libros.xhtml" class="admin-nav-link">
-                    <i class="pi pi-book"></i> Gestionar Libros
+                    <i class="pi pi-book"/> Gestión de Libros
                 </a>
                 <a href="/sistema-gestion-biblioteca/admin/reportes.xhtml" class="admin-nav-link active">
-                    <i class="pi pi-chart-bar"></i> Reportes
+                    <i class="pi pi-chart-bar"/> Reportes
                 </a>
             </div>
 
-            <div class="reportes-grid">
-                <div class="reporte-card">
-                    <div class="reporte-icon"><i class="pi pi-star-fill"></i></div>
-                    <div class="reporte-card-body">
-                        <h3>Libros más prestados</h3>
-                        <p>Ranking de los libros con mayor cantidad de préstamos registrados.</p>
-                        <h:form id="formTopLibros">
-                            <div class="reporte-top-input"><label>Top</label><p:inputText value="#{reporteBean.topLibros}" styleClass="top-num"/></div>
-                            <div class="reporte-buttons">
-                                <p:commandButton value="PDF" icon="pi pi-file-pdf"
-                                                 action="#{reporteBean.descargarLibrosMasPrestadosPDF()}"
-                                                 styleClass="btn-pdf" ajax="false"/>
-                                <p:commandButton value="Excel" icon="pi pi-file-excel"
-                                                 action="#{reporteBean.descargarLibrosMasPrestadosExcel()}"
-                                                 styleClass="btn-excel" ajax="false"/>
-                            </div>
-                        </h:form>
-                    </div>
-                </div>
+            <!-- Libreria de graficos Chart.js -->
+            <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+            <script type="text/javascript">
+                window.RPT = window.RPT || { _charts: {} };
 
-                <div class="reporte-card">
-                    <div class="reporte-icon"><i class="pi pi-user"></i></div>
-                    <div class="reporte-card-body">
-                        <h3>Autores más populares</h3>
-                        <p>Autores con mayor cantidad de préstamos en el sistema.</p>
-                        <h:form id="formTopAutores">
-                            <div class="reporte-top-input"><label>Top</label><p:inputText value="#{reporteBean.topAutores}" styleClass="top-num"/></div>
-                            <div class="reporte-buttons">
-                                <p:commandButton value="PDF" icon="pi pi-file-pdf"
-                                                 action="#{reporteBean.descargarAutoresPopularesPDF()}"
-                                                 styleClass="btn-pdf" ajax="false"/>
-                                <p:commandButton value="Excel" icon="pi pi-file-excel"
-                                                 action="#{reporteBean.descargarAutoresPopularesExcel()}"
-                                                 styleClass="btn-excel" ajax="false"/>
-                            </div>
-                        </h:form>
-                    </div>
-                </div>
+                RPT.palette = ['#004fea','#C9A96E','#34d399','#f87171','#a78bfa',
+                               '#38bdf8','#fbbf24','#fb7185','#22d3ee','#e879f9'];
 
-                <div class="reporte-card">
-                    <div class="reporte-icon"><i class="pi pi-exclamation-triangle"></i></div>
-                    <div class="reporte-card-body">
-                        <h3>Préstamos vencidos</h3>
-                        <p>Listado completo de préstamos cuyo plazo de devolución ha expirado.</p>
-                        <h:form id="formVencidos">
-                            <div class="reporte-buttons">
-                                <p:commandButton value="PDF" icon="pi pi-file-pdf"
-                                                 action="#{reporteBean.descargarPrestamosVencidosPDF()}"
-                                                 styleClass="btn-pdf" ajax="false"/>
-                                <p:commandButton value="Excel" icon="pi pi-file-excel"
-                                                 action="#{reporteBean.descargarPrestamosVencidosExcel()}"
-                                                 styleClass="btn-excel" ajax="false"/>
-                            </div>
-                        </h:form>
-                    </div>
-                </div>
+                RPT.theme = function () {
+                    if (!window.Chart) return;
+                    Chart.defaults.maintainAspectRatio = false;
+                    Chart.defaults.responsive = true;
+                    Chart.defaults.color = '#9aa6bd';
+                    Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+                    if (Chart.defaults.font) {
+                        Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
+                    }
+                };
 
-                <div class="reporte-card">
-                    <div class="reporte-icon"><i class="pi pi-tags"></i></div>
-                    <div class="reporte-card-body">
-                        <h3>Préstamos por categoría</h3>
-                        <p>Cantidad de préstamos agrupados por categoría de libro.</p>
-                        <h:form id="formCategorias">
-                            <div class="reporte-top-input"><label>Top</label><p:inputText value="#{reporteBean.topCategorias}" styleClass="top-num"/></div>
-                            <div class="reporte-buttons">
-                                <p:commandButton value="PDF" icon="pi pi-file-pdf"
-                                                 action="#{reporteBean.descargarLibrosPorCategoriaPDF()}"
-                                                 styleClass="btn-pdf" ajax="false"/>
-                                <p:commandButton value="Excel" icon="pi pi-file-excel"
-                                                 action="#{reporteBean.descargarLibrosPorCategoriaExcel()}"
-                                                 styleClass="btn-excel" ajax="false"/>
-                            </div>
-                        </h:form>
-                    </div>
-                </div>
+                RPT.make = function (id, config) {
+                    var cv = document.getElementById(id);
+                    if (!cv || !window.Chart) return;
+                    if (RPT._charts[id]) { RPT._charts[id].destroy(); }
+                    RPT._charts[id] = new Chart(cv, config);
+                };
 
-                <div class="reporte-card">
-                    <div class="reporte-icon" style="background:rgba(220,38,38,0.15);"><i class="pi pi-ban" style="color:#DC2626;"></i></div>
-                    <div class="reporte-card-body">
-                        <h3>Préstamos penalizados</h3>
-                        <p>Préstamos con penalización por devolución fuera de plazo.</p>
-                        <h:form id="formPenalizados">
-                            <div class="reporte-buttons">
-                                <p:commandButton value="PDF" icon="pi pi-file-pdf"
-                                                 action="#{reporteBean.descargarPrestamosPenalizadosPDF()}"
-                                                 styleClass="btn-pdf" ajax="false"/>
-                                <p:commandButton value="Excel" icon="pi pi-file-excel"
-                                                 action="#{reporteBean.descargarPrestamosPenalizadosExcel()}"
-                                                 styleClass="btn-excel" ajax="false"/>
+                RPT.bar = function (id, d, fondo, borde) {
+                    RPT.make(id, {
+                        type: 'bar',
+                        data: { labels: d.labels, datasets: [{
+                            data: d.data, backgroundColor: fondo,
+                            borderColor: borde, borderWidth: 1, borderRadius: 4
+                        }]},
+                        options: {
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: { grid: { display: false } },
+                                y: { beginAtZero: true, ticks: { precision: 0 } }
+                            }
+                        }
+                    });
+                };
+
+                RPT.donut = function (id, d) {
+                    RPT.make(id, {
+                        type: 'doughnut',
+                        data: { labels: d.labels, datasets: [{
+                            data: d.data, backgroundColor: RPT.palette,
+                            borderColor: '#0d1424', borderWidth: 2
+                        }]},
+                        options: {
+                            cutout: '60%',
+                            plugins: { legend: { position: 'right',
+                                labels: { boxWidth: 12, padding: 10 } } }
+                        }
+                    });
+                };
+
+                RPT.line = function (id, d) {
+                    RPT.make(id, {
+                        type: 'line',
+                        data: { labels: d.labels, datasets: [{
+                            data: d.data, borderColor: '#C9A96E',
+                            backgroundColor: 'rgba(201,169,110,0.12)',
+                            fill: true, tension: 0.35,
+                            pointBackgroundColor: '#C9A96E', pointRadius: 3
+                        }]},
+                        options: {
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: { grid: { display: false } },
+                                y: { beginAtZero: true, ticks: { precision: 0 } }
+                            }
+                        }
+                    });
+                };
+
+                RPT.theme();
+            </script>
+
+            <div class="rpt-list">
+
+                <!-- ===== REPORTE 1: LIBROS MAS PRESTADOS ===== -->
+                <section class="rpt-card">
+                    <h:form>
+                        <div class="rpt-head">
+                            <span class="rpt-icon rpt-icon-blue"><i class="pi pi-star-fill"/></span>
+                            <div class="rpt-head-text">
+                                <h2 class="rpt-title">Libros más prestados</h2>
+                                <p class="rpt-desc">Los 8 títulos con mayor demanda y su ficha de catálogo.</p>
                             </div>
-                        </h:form>
-                    </div>
-                </div>
+                        </div>
+
+                        <h:panelGroup layout="block" styleClass="rpt-body"
+                                      rendered="#{not empty reporteBean.datosLibros}">
+                            <div class="rpt-chart"><canvas id="cvLibros"></canvas></div>
+                            <div class="rpt-data">
+                                <table class="rpt-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Título</th><th>Autor</th><th>Categoría</th>
+                                            <th class="rpt-num">Ejemp.</th><th class="rpt-num">Préstamos</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <ui:repeat value="#{reporteBean.datosLibros}" var="r">
+                                            <tr>
+                                                <td class="rpt-strong">#{r[0]}</td>
+                                                <td>#{r[1]}</td>
+                                                <td>#{r[2]}</td>
+                                                <td class="rpt-num">#{r[3]}</td>
+                                                <td class="rpt-num rpt-strong">#{r[4]}</td>
+                                            </tr>
+                                        </ui:repeat>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </h:panelGroup>
+                        <h:panelGroup layout="block" styleClass="rpt-empty"
+                                      rendered="#{empty reporteBean.datosLibros}">
+                            <i class="pi pi-inbox"/>
+                            <p>Aún no hay préstamos registrados.</p>
+                        </h:panelGroup>
+
+                        <div class="rpt-foot">
+                            <p:commandButton value="PDF" icon="pi pi-file-pdf" ajax="false"
+                                             styleClass="rpt-btn rpt-btn-pdf"
+                                             action="#{reporteBean.pdfLibros}"/>
+                            <p:commandButton value="Excel" icon="pi pi-file-excel" ajax="false"
+                                             styleClass="rpt-btn rpt-btn-excel"
+                                             action="#{reporteBean.excelLibros}"/>
+                        </div>
+                    </h:form>
+                </section>
+
+                <!-- ===== REPORTE 2: USUARIOS CON MAS MOROSIDAD ===== -->
+                <section class="rpt-card">
+                    <h:form>
+                        <div class="rpt-head">
+                            <span class="rpt-icon rpt-icon-red"><i class="pi pi-exclamation-triangle"/></span>
+                            <div class="rpt-head-text">
+                                <h2 class="rpt-title">Usuarios con más morosidad</h2>
+                                <p class="rpt-desc">Estudiantes que más devuelven fuera de plazo y su nivel de retraso.</p>
+                            </div>
+                        </div>
+
+                        <h:panelGroup layout="block" styleClass="rpt-body"
+                                      rendered="#{not empty reporteBean.datosMorosidad}">
+                            <div class="rpt-chart"><canvas id="cvMorosidad"></canvas></div>
+                            <div class="rpt-data">
+                                <table class="rpt-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Estudiante</th><th>Código</th>
+                                            <th class="rpt-num">Tardías</th>
+                                            <th class="rpt-num">Días prom.</th>
+                                            <th class="rpt-num">Total días</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <ui:repeat value="#{reporteBean.datosMorosidad}" var="r">
+                                            <tr>
+                                                <td class="rpt-strong">#{r[0]}</td>
+                                                <td>#{r[1]}</td>
+                                                <td class="rpt-num">#{r[2]}</td>
+                                                <td class="rpt-num">
+                                                    <h:outputText value="#{r[3]}">
+                                                        <f:convertNumber minFractionDigits="1" maxFractionDigits="1"/>
+                                                    </h:outputText>
+                                                </td>
+                                                <td class="rpt-num">#{r[4]}</td>
+                                                <td>
+                                                    <span class="rpt-badge #{r[5] ? 'rpt-badge-bad' : 'rpt-badge-ok'}">
+                                                        #{r[5] ? 'Penalizado' : 'Habilitado'}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </ui:repeat>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </h:panelGroup>
+                        <h:panelGroup layout="block" styleClass="rpt-empty"
+                                      rendered="#{empty reporteBean.datosMorosidad}">
+                            <i class="pi pi-check-circle"/>
+                            <p>Sin devoluciones tardías registradas. Buen cumplimiento.</p>
+                        </h:panelGroup>
+
+                        <div class="rpt-foot">
+                            <p:commandButton value="PDF" icon="pi pi-file-pdf" ajax="false"
+                                             styleClass="rpt-btn rpt-btn-pdf"
+                                             action="#{reporteBean.pdfMorosidad}"/>
+                            <p:commandButton value="Excel" icon="pi pi-file-excel" ajax="false"
+                                             styleClass="rpt-btn rpt-btn-excel"
+                                             action="#{reporteBean.excelMorosidad}"/>
+                        </div>
+                    </h:form>
+                </section>
+
+                <!-- ===== REPORTE 3: PRESTAMOS POR CATEGORIA ===== -->
+                <section class="rpt-card">
+                    <h:form>
+                        <div class="rpt-head">
+                            <span class="rpt-icon rpt-icon-violet"><i class="pi pi-chart-pie"/></span>
+                            <div class="rpt-head-text">
+                                <h2 class="rpt-title">Préstamos por categoría</h2>
+                                <p class="rpt-desc">Distribución de la demanda entre las áreas temáticas del catálogo.</p>
+                            </div>
+                        </div>
+
+                        <h:panelGroup layout="block" styleClass="rpt-body"
+                                      rendered="#{not empty reporteBean.datosCategoria}">
+                            <div class="rpt-chart"><canvas id="cvCategoria"></canvas></div>
+                            <div class="rpt-data">
+                                <table class="rpt-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Categoría</th>
+                                            <th class="rpt-num">Préstamos</th>
+                                            <th class="rpt-num">% del total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <ui:repeat value="#{reporteBean.datosCategoria}" var="r">
+                                            <tr>
+                                                <td class="rpt-strong">#{r[0]}</td>
+                                                <td class="rpt-num">#{r[1]}</td>
+                                                <td class="rpt-num">#{r[2]}</td>
+                                            </tr>
+                                        </ui:repeat>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </h:panelGroup>
+                        <h:panelGroup layout="block" styleClass="rpt-empty"
+                                      rendered="#{empty reporteBean.datosCategoria}">
+                            <i class="pi pi-inbox"/>
+                            <p>Aún no hay préstamos registrados.</p>
+                        </h:panelGroup>
+
+                        <div class="rpt-foot">
+                            <p:commandButton value="PDF" icon="pi pi-file-pdf" ajax="false"
+                                             styleClass="rpt-btn rpt-btn-pdf"
+                                             action="#{reporteBean.pdfCategoria}"/>
+                            <p:commandButton value="Excel" icon="pi pi-file-excel" ajax="false"
+                                             styleClass="rpt-btn rpt-btn-excel"
+                                             action="#{reporteBean.excelCategoria}"/>
+                        </div>
+                    </h:form>
+                </section>
+
+                <!-- ===== REPORTE 4: TENDENCIA DE PRESTAMOS POR MES ===== -->
+                <section class="rpt-card">
+                    <h:form>
+                        <div class="rpt-head">
+                            <span class="rpt-icon rpt-icon-gold"><i class="pi pi-chart-line"/></span>
+                            <div class="rpt-head-text">
+                                <h2 class="rpt-title">Tendencia de préstamos por mes</h2>
+                                <p class="rpt-desc">Evolución mensual de los préstamos durante el año seleccionado.</p>
+                            </div>
+                            <div class="rpt-filter">
+                                <label>Año</label>
+                                <p:selectOneMenu value="#{reporteBean.anioSeleccionado}" styleClass="rpt-select">
+                                    <f:selectItems value="#{reporteBean.anios}"/>
+                                    <p:ajax listener="#{reporteBean.onAnioChange}" update="panelTendencia"/>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+
+                        <h:panelGroup id="panelTendencia" layout="block" styleClass="rpt-body">
+                            <div class="rpt-chart"><canvas id="cvTendencia"></canvas></div>
+                            <div class="rpt-data">
+                                <table class="rpt-table">
+                                    <thead>
+                                        <tr><th>Mes</th><th class="rpt-num">Préstamos</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <ui:repeat value="#{reporteBean.datosTendencia}" var="r">
+                                            <tr>
+                                                <td class="rpt-strong">#{r[0]}</td>
+                                                <td class="rpt-num">#{r[1]}</td>
+                                            </tr>
+                                        </ui:repeat>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <script type="text/javascript">
+                                RPT.line('cvTendencia',
+                                    <h:outputText escape="false" value="#{reporteBean.chartTendenciaJson}"/>);
+                            </script>
+                        </h:panelGroup>
+
+                        <div class="rpt-foot">
+                            <p:commandButton value="PDF" icon="pi pi-file-pdf" ajax="false"
+                                             styleClass="rpt-btn rpt-btn-pdf"
+                                             action="#{reporteBean.pdfTendencia}"/>
+                            <p:commandButton value="Excel" icon="pi pi-file-excel" ajax="false"
+                                             styleClass="rpt-btn rpt-btn-excel"
+                                             action="#{reporteBean.excelTendencia}"/>
+                        </div>
+                    </h:form>
+                </section>
+
             </div>
 
+            <!-- Construccion de los graficos fijos (sus canvas ya estan en el DOM) -->
+            <script type="text/javascript">
+                RPT.bar('cvLibros',
+                    <h:outputText escape="false" value="#{reporteBean.chartLibrosJson}"/>,
+                    'rgba(0,79,234,0.55)', '#4da3ff');
+                RPT.bar('cvMorosidad',
+                    <h:outputText escape="false" value="#{reporteBean.chartMorosidadJson}"/>,
+                    'rgba(248,113,113,0.50)', '#f87171');
+                RPT.donut('cvCategoria',
+                    <h:outputText escape="false" value="#{reporteBean.chartCategoriaJson}"/>);
+            </script>
+
             <div class="admin-footer-link">
-                <a href="/sistema-gestion-biblioteca/index.xhtml" class="btn-ghost-admin">← Volver al inicio</a>
+                <a href="/sistema-gestion-biblioteca/admin/index.xhtml" class="btn-ghost-admin">← Volver al panel</a>
             </div>
         </div>
     </h:panelGroup>

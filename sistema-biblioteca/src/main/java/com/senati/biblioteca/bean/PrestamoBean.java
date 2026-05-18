@@ -84,19 +84,6 @@ public class PrestamoBean implements Serializable {
         return null;
     }
 
-    public void registrarDevolucion(Long prestamoId) {
-        try {
-            prestamoService.registrarDevolucion(prestamoId);
-            cargarPrestamosActivos();
-            cargarHistorial();
-            FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage("Devolución registrada correctamente."));
-        } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getMessage()));
-        }
-    }
-
     public List<Integer> estrellasValoracion(Libro libro, String codigo) {
         return Arrays.asList(1, 2, 3, 4, 5);
     }

@@ -1,0 +1,45 @@
+# =============================================================================
+# docker-compose.yml - Biblioteca SENATI
+#
+# Levanta dos contenedores y los conecta en una red privada:
+#   db  -> base de datos MySQL
+#   app -> la aplicacion en WildFly (construida con el Dockerfile)
+#
+# Comando para levantar todo:  docker compose up -d --build
+# =============================================================================
+
+services:
+
+  # ---- Base de datos MySQL ----
+  db:
+    image: mysql:8.4
+    container_name: biblioteca-db
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: REDACTED
+      MYSQL_DATABASE: biblioteca_db
+      MYSQL_USER: biblioteca
+      MYSQL_PASSWORD: REDACTED
+    volumes:
+      - db_data:/var/lib/mysql          # los datos persisten aunque se reinicie
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pREDACTED"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+    restart: unless-stopped
+
+  # ---- Aplicacion (WildFly) ----
+  app:
+    build: .
+    container_name: biblioteca-app
+    ports:
+      - "8080:8080"                     # accesible en http://IP:8080
+    depends_on:
+      db:
+        condition: service_healthy      # arranca solo cuando MySQL esta listo
+    restart: unless-stopped
+
+volumes:
+  db_data:

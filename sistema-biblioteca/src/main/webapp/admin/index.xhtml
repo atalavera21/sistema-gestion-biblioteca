@@ -1,8 +1,15 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 template="/WEB-INF/templates/plantilla.xhtml">
-<ui:define name="titulo">Administracion - Biblioteca SENATI</ui:define>
+
+<f:metadata>
+    <f:event type="preRenderView" listener="#{adminBean.onDashboardLoad}"/>
+</f:metadata>
+
+<ui:define name="titulo">Panel de Administración — Biblioteca SENATI</ui:define>
 <ui:define name="contenido">
 
     <h:panelGroup rendered="#{not authBean.autenticado or authBean.rol != 'ADMIN'}">
@@ -13,35 +20,55 @@
     </h:panelGroup>
 
     <h:panelGroup rendered="#{authBean.autenticado and authBean.rol == 'ADMIN'}">
-        <div class="admin-container admin-dashboard-page">
+        <div class="admin-container ahub">
 
-            <div class="admin-page-header">
+            <!-- ===== CABECERA ===== -->
+            <header class="ahub-head">
                 <div>
-                    <h1 class="page-title admin-page-title">Panel de Administracion</h1>
-                    <p class="admin-page-subtitle">Selecciona el modulo que vas a administrar.</p>
+                    <span class="ahub-eyebrow">Biblioteca SENATI</span>
+                    <h1 class="ahub-title">Panel de Administración</h1>
                 </div>
-            </div>
+                <div class="ahub-date">
+                    <i class="pi pi-calendar"/>
+                    <h:outputText value="#{adminBean.fechaHoy}">
+                        <f:convertDateTime pattern="EEEE, dd 'de' MMMM 'de' yyyy" locale="es" timeZone="America/Lima"/>
+                    </h:outputText>
+                </div>
+            </header>
 
-            <div class="admin-menu-grid">
-                <a href="/sistema-gestion-biblioteca/admin/libros.xhtml" class="admin-menu-card">
-                    <span class="admin-menu-icon">
-                        <i class="pi pi-book"/>
-                    </span>
-                    <span class="admin-menu-content">
-                        <span class="admin-menu-title">Gestion de Libros</span>
-                        <span class="admin-menu-desc">Catalogo, prestamos activos y devoluciones pendientes</span>
+            <!-- ===== DOS MÓDULOS ===== -->
+            <div class="ahub-grid">
+
+                <a href="/sistema-gestion-biblioteca/admin/libros.xhtml"
+                   class="ahub-card ahub-card-libros">
+                    <i class="pi pi-book ahub-card-ghost"/>
+                    <span class="ahub-card-tag">Módulo 01</span>
+                    <span class="ahub-card-icon"><i class="pi pi-book"/></span>
+                    <h2 class="ahub-card-title">Gestión de Libros</h2>
+                    <p class="ahub-card-desc">
+                        Administra el catálogo completo, registra préstamos y gestiona
+                        las devoluciones del inventario de ejemplares.
+                    </p>
+                    <span class="ahub-card-go">
+                        Ingresar al módulo <i class="pi pi-arrow-right"/>
                     </span>
                 </a>
 
-                <a href="/sistema-gestion-biblioteca/admin/reportes.xhtml" class="admin-menu-card">
-                    <span class="admin-menu-icon" style="background:rgba(201,169,110,0.15);">
-                        <i class="pi pi-chart-bar" style="color:#C9A96E;"/>
-                    </span>
-                    <span class="admin-menu-content">
-                        <span class="admin-menu-title">Reportes</span>
-                        <span class="admin-menu-desc">Generar reportes en PDF y Excel</span>
+                <a href="/sistema-gestion-biblioteca/admin/reportes.xhtml"
+                   class="ahub-card ahub-card-reportes">
+                    <i class="pi pi-chart-bar ahub-card-ghost"/>
+                    <span class="ahub-card-tag">Módulo 02</span>
+                    <span class="ahub-card-icon"><i class="pi pi-chart-bar"/></span>
+                    <h2 class="ahub-card-title">Reportes y Análisis</h2>
+                    <p class="ahub-card-desc">
+                        Genera informes estadísticos con gráficos visuales y
+                        expórtalos en formato PDF o Excel.
+                    </p>
+                    <span class="ahub-card-go">
+                        Ingresar al módulo <i class="pi pi-arrow-right"/>
                     </span>
                 </a>
+
             </div>
 
         </div>

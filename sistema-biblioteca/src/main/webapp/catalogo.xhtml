@@ -1,6 +1,9 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:jsf="http://xmlns.jcp.org/jsf"
     xmlns:ui="http://xmlns.jcp.org/jsf/facelets" template="/WEB-INF/templates/plantilla.xhtml">
+    <f:metadata>
+        <f:event type="preRenderView" listener="#{catalogoBean.onLoad}"/>
+    </f:metadata>
     <ui:define name="titulo">Catálogo — Biblioteca SENATI</ui:define>
     <ui:define name="contenido">
 
@@ -49,6 +52,16 @@
                     <p:growl id="growl" showDetail="true" life="4000"/>
                 </h:form>
 
+                <h:form id="formConfirmCatalogo">
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade"
+                                     responsive="true" width="420" styleClass="confirm-dialog">
+                        <p:commandButton value="Confirmar" type="button"
+                                         styleClass="ui-confirmdialog-yes btn-primary" icon="pi pi-check"/>
+                        <p:commandButton value="Cancelar" type="button"
+                                         styleClass="ui-confirmdialog-no btn-secondary" icon="pi pi-times"/>
+                    </p:confirmDialog>
+                </h:form>
+
                 <h:form id="libros">
                     <h:panelGroup layout="block" rendered="#{empty catalogoBean.resultados}">
                         <div class="empty-state" style="padding:60px 20px;">
@@ -82,7 +95,12 @@
                                         <ui:repeat value="#{catalogoBean.estrellasLista(libro)}" var="s">
                                             <span class="star #{s == 2 ? 'on' : (s == 1 ? 'half' : '')}">★</span>
                                         </ui:repeat>
-                                        <span class="stars-count">#{libro.puntuacion}</span>
+                                        <span class="stars-count">
+                                            <h:outputText value="#{libro.puntuacion}">
+                                                <f:convertNumber maxFractionDigits="1"/>
+                                            </h:outputText>
+                                            (#{libro.totalValoraciones})
+                                        </span>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{libro.puntuacion == null}" layout="block"
                                                    style="margin-top:4px;">
@@ -103,11 +121,16 @@
                                             update=":dlgEditor"
                                             oncomplete="PF('dlgEditor').show()"
                                             styleClass="card-btn card-btn-outline"/>
-                                        <p:commandButton value="Eliminar" icon="pi pi-trash"
-                                            action="#{adminBean.prepararEliminar(libro)}"
-                                            update=":dlgEliminar"
-                                            oncomplete="PF('dlgEliminar').show()"
-                                            styleClass="card-btn card-btn-outline" style="color:#A42834!important; border-color:#A42834!important;"/>
+                                        <p:commandButton value="#{libro.activo ? 'Desactivar' : 'Activar'}"
+                                            icon="#{libro.activo ? 'pi pi-eye-slash' : 'pi pi-eye'}"
+                                            action="#{catalogoBean.alternarEstado(libro)}"
+                                            update=":libros :formMsgs"
+                                            styleClass="card-btn card-btn-outline">
+                                            <p:confirm disabled="#{not libro.activo}"
+                                                       header="Desactivar libro"
+                                                       message="El libro dejará de estar disponible para préstamos. ¿Continuar?"
+                                                       icon="pi pi-exclamation-triangle"/>
+                                        </p:commandButton>
                                     </div>
                                 </h:panelGroup>
 

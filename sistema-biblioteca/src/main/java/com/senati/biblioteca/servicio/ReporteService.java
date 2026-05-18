@@ -1,7 +1,7 @@
 package com.senati.biblioteca.servicio;
 
+import com.senati.biblioteca.dao.DevolucionDAO;
 import com.senati.biblioteca.dao.PrestamoDAO;
-import com.senati.biblioteca.modelo.Prestamo;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -14,9 +14,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.ByteArrayOutputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @ApplicationScoped
@@ -25,50 +23,190 @@ public class ReporteService {
     @Inject
     private PrestamoDAO prestamoDAO;
 
-    public byte[] generarLibrosMasPrestados(int top) {
-        List<Object[]> datos = prestamoDAO.findLibrosMasPrestados(top);
-        List<String[]> filas = new ArrayList<>();
-        for (Object[] row : datos) {
-            filas.add(new String[]{
-                row[0] != null ? row[0].toString() : "",
-                row[1] != null ? row[1].toString() : ""
-            });
-        }
-        return generarPDF("Libros mas prestados (Top " + top + ")",
-            new String[]{"Titulo", "Cantidad"}, filas,
-            new float[]{70, 30});
+    @Inject
+    private DevolucionDAO devolucionDAO;
+
+    /** Cantidad de filas para los rankings (libros, morosidad). */
+    public static final int TOP = 8;
+
+    private static final String[] MESES = {
+        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    };
+
+    // ============================================================
+    // Datos crudos (para graficos y tablas en la vista)
+    // ============================================================
+
+    public List<Object[]> datosLibrosMasPrestados() {
+        return prestamoDAO.findLibrosMasPrestadosDetalle(TOP);
     }
 
-    public byte[] generarAutoresMasPopulares(int top) {
-        List<Object[]> datos = prestamoDAO.findAutoresMasPopulares(top);
-        List<String[]> filas = new ArrayList<>();
-        for (Object[] row : datos) {
-            filas.add(new String[]{
-                row[0] != null ? row[0].toString() : "",
-                row[1] != null ? row[1].toString() : ""
-            });
-        }
-        return generarPDF("Autores mas populares (Top " + top + ")",
-            new String[]{"Autor", "Cantidad"}, filas,
-            new float[]{50, 50});
+    public List<Object[]> datosMorosidad() {
+        return devolucionDAO.findMorosidadPorUsuario(TOP);
     }
 
-    public byte[] generarPrestamosVencidos() {
-        List<Prestamo> vencidos = prestamoDAO.findVencidos();
+    public List<Object[]> datosPorCategoria() {
+        return prestamoDAO.findLibrosPorCategoria(50);
+    }
+
+    /** Devuelve 12 valores (Ene..Dic) con el conteo de prestamos del anio. */
+    public long[] datosTendencia(int anio) {
+        long[] meses = new long[12];
+        for (Object[] row : prestamoDAO.findPrestamosPorMes(anio)) {
+            int mes = ((Number) row[0]).intValue();
+            long total = ((Number) row[1]).longValue();
+            if (mes >= 1 && mes <= 12) {
+                meses[mes - 1] = total;
+            }
+        }
+        return meses;
+    }
+
+    public List<Integer> aniosDisponibles() {
+        return prestamoDAO.findAniosConPrestamos();
+    }
+
+    public String nombreMes(int indice) {
+        return (indice >= 0 && indice < 12) ? MESES[indice] : "";
+    }
+
+    // ============================================================
+    // Reporte 1: Libros mas prestados
+    // ============================================================
+
+    public byte[] pdfLibrosMasPrestados() {
         List<String[]> filas = new ArrayList<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        for (Prestamo p : vencidos) {
+        for (Object[] r : datosLibrosMasPrestados()) {
             filas.add(new String[]{
-                p.getLibro().getTitulo(),
-                p.getUsuario().getNombre(),
-                sdf.format(p.getFechaDevolucionEstimada()),
-                p.getEstado().toString()
+                texto(r[0]), texto(r[1]), texto(r[2]), texto(r[3]), texto(r[4])
             });
         }
-        return generarPDF("Prestamos vencidos al " + sdf.format(new Date()),
-            new String[]{"Libro", "Usuario", "Vencia", "Estado"}, filas,
-            new float[]{35, 25, 20, 20});
+        return generarPDF("Libros mas prestados (Top " + TOP + ")",
+            new String[]{"Titulo", "Autor", "Categoria", "Ejemplares", "Prestamos"},
+            filas, new float[]{34, 25, 18, 11, 12});
     }
+
+    public byte[] excelLibrosMasPrestados() {
+        return generarExcel("Libros mas prestados",
+            new String[]{"Titulo", "Autor", "Categoria", "Ejemplares", "Prestamos"},
+            datosLibrosMasPrestados());
+    }
+
+    // ============================================================
+    // Reporte 2: Usuarios con mas morosidad
+    // ============================================================
+
+    public byte[] pdfMorosidad() {
+        List<String[]> filas = new ArrayList<>();
+        for (Object[] r : datosMorosidad()) {
+            filas.add(new String[]{
+                texto(r[0]), texto(r[1]), texto(r[2]),
+                promedio(r[3]), texto(r[4]),
+                Boolean.TRUE.equals(r[5]) ? "Penalizado" : "Habilitado"
+            });
+        }
+        return generarPDF("Usuarios con mas morosidad (Top " + TOP + ")",
+            new String[]{"Estudiante", "Codigo", "Dev. tardias", "Dias promedio", "Total dias", "Estado"},
+            filas, new float[]{27, 17, 15, 15, 12, 14});
+    }
+
+    public byte[] excelMorosidad() {
+        List<Object[]> filas = new ArrayList<>();
+        for (Object[] r : datosMorosidad()) {
+            filas.add(new Object[]{
+                texto(r[0]), texto(r[1]), texto(r[2]),
+                promedio(r[3]), texto(r[4]),
+                Boolean.TRUE.equals(r[5]) ? "Penalizado" : "Habilitado"
+            });
+        }
+        return generarExcel("Usuarios con mas morosidad",
+            new String[]{"Estudiante", "Codigo", "Dev. tardias", "Dias promedio", "Total dias", "Estado"},
+            filas);
+    }
+
+    // ============================================================
+    // Reporte 3: Prestamos por categoria
+    // ============================================================
+
+    public byte[] pdfPorCategoria() {
+        List<Object[]> datos = datosPorCategoria();
+        long total = totalConteo(datos);
+        List<String[]> filas = new ArrayList<>();
+        for (Object[] r : datos) {
+            long c = ((Number) r[1]).longValue();
+            filas.add(new String[]{texto(r[0]), String.valueOf(c), porcentaje(c, total)});
+        }
+        return generarPDF("Prestamos por categoria",
+            new String[]{"Categoria", "Prestamos", "Porcentaje"},
+            filas, new float[]{50, 25, 25});
+    }
+
+    public byte[] excelPorCategoria() {
+        List<Object[]> datos = datosPorCategoria();
+        long total = totalConteo(datos);
+        List<Object[]> filas = new ArrayList<>();
+        for (Object[] r : datos) {
+            long c = ((Number) r[1]).longValue();
+            filas.add(new Object[]{texto(r[0]), c, porcentaje(c, total)});
+        }
+        return generarExcel("Prestamos por categoria",
+            new String[]{"Categoria", "Prestamos", "Porcentaje"}, filas);
+    }
+
+    // ============================================================
+    // Reporte 4: Tendencia de prestamos por mes
+    // ============================================================
+
+    public byte[] pdfTendencia(int anio) {
+        long[] meses = datosTendencia(anio);
+        List<String[]> filas = new ArrayList<>();
+        for (int i = 0; i < 12; i++) {
+            filas.add(new String[]{MESES[i], String.valueOf(meses[i])});
+        }
+        return generarPDF("Tendencia de prestamos - " + anio,
+            new String[]{"Mes", "Prestamos"}, filas, new float[]{60, 40});
+    }
+
+    public byte[] excelTendencia(int anio) {
+        long[] meses = datosTendencia(anio);
+        List<Object[]> filas = new ArrayList<>();
+        for (int i = 0; i < 12; i++) {
+            filas.add(new Object[]{MESES[i], meses[i]});
+        }
+        return generarExcel("Tendencia " + anio,
+            new String[]{"Mes", "Prestamos"}, filas);
+    }
+
+    // ============================================================
+    // Helpers de formato
+    // ============================================================
+
+    private String texto(Object o) {
+        return o != null ? o.toString() : "";
+    }
+
+    private String promedio(Object o) {
+        if (o == null) return "0";
+        return String.format("%.1f", ((Number) o).doubleValue());
+    }
+
+    private String porcentaje(long parte, long total) {
+        if (total <= 0) return "0%";
+        return String.format("%.1f%%", parte * 100.0 / total);
+    }
+
+    private long totalConteo(List<Object[]> datos) {
+        long total = 0;
+        for (Object[] r : datos) {
+            total += ((Number) r[1]).longValue();
+        }
+        return total;
+    }
+
+    // ============================================================
+    // Generacion de PDF (Apache PDFBox)
+    // ============================================================
 
     private byte[] generarPDF(String titulo, String[] columnas, List<String[]> filas,
                               float[] porcentajes) {
@@ -107,7 +245,6 @@ public class ReporteService {
             float y = PDRectangle.A4.getHeight() - 50;
             float x = 50;
 
-            // Titulo (solo en primera pagina)
             if (titulo != null) {
                 cs.beginText();
                 cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 14);
@@ -117,7 +254,6 @@ public class ReporteService {
                 y -= 25;
             }
 
-            // Encabezados
             cs.beginText();
             cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 9);
             cs.newLineAtOffset(x, y);
@@ -128,7 +264,6 @@ public class ReporteService {
             cs.endText();
             y -= 15;
 
-            // Filas
             cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 8);
             for (int i = desdeFila; i < filas.size() && y > 50; i++) {
                 String[] fila = filas.get(i);
@@ -152,99 +287,8 @@ public class ReporteService {
     }
 
     // ============================================================
-    // Reportes Excel (Apache POI)
+    // Generacion de Excel (Apache POI)
     // ============================================================
-
-    public byte[] generarExcelLibrosMasPrestados(int top) {
-        List<Object[]> datos = prestamoDAO.findLibrosMasPrestados(top);
-        return generarExcel("Libros mas prestados",
-            new String[]{"Titulo", "Cantidad de prestamos"}, datos);
-    }
-
-    public byte[] generarExcelAutoresPopulares(int top) {
-        List<Object[]> datos = prestamoDAO.findAutoresMasPopulares(top);
-        return generarExcel("Autores mas populares",
-            new String[]{"Autor", "Cantidad de prestamos"}, datos);
-    }
-
-    public byte[] generarExcelPrestamosVencidos() {
-        List<Prestamo> vencidos = prestamoDAO.findVencidos();
-        List<Object[]> datos = new ArrayList<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        for (Prestamo p : vencidos) {
-            datos.add(new Object[]{
-                p.getLibro().getTitulo(),
-                p.getUsuario().getNombre(),
-                sdf.format(p.getFechaDevolucionEstimada()),
-                p.getEstado().toString()
-            });
-        }
-        return generarExcel("Prestamos vencidos",
-            new String[]{"Libro", "Usuario", "Vencia", "Estado"}, datos);
-    }
-
-    // ============================================================
-    // Reportes: Libros por categoria
-    // ============================================================
-
-    public byte[] generarLibrosPorCategoria(int top) {
-        List<Object[]> datos = prestamoDAO.findLibrosPorCategoria(top);
-        List<String[]> filas = new ArrayList<>();
-        for (Object[] row : datos) {
-            filas.add(new String[]{
-                row[0] != null ? row[0].toString() : "",
-                row[1] != null ? row[1].toString() : ""
-            });
-        }
-        return generarPDF("Prestamos por categoria (Top " + top + ")",
-            new String[]{"Categoria", "Prestamos"}, filas,
-            new float[]{60, 40});
-    }
-
-    public byte[] generarExcelLibrosPorCategoria(int top) {
-        List<Object[]> datos = prestamoDAO.findLibrosPorCategoria(top);
-        return generarExcel("Prestamos por categoria",
-            new String[]{"Categoria", "Cantidad de prestamos"}, datos);
-    }
-
-    // ============================================================
-    // Reportes: Prestamos penalizados
-    // ============================================================
-
-    public byte[] generarPrestamosPenalizados() {
-        List<Prestamo> penalizados = prestamoDAO.findPrestamosPenalizados();
-        List<String[]> filas = new ArrayList<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        for (Prestamo p : penalizados) {
-            filas.add(new String[]{
-                p.getLibro().getTitulo(),
-                p.getUsuario().getNombre(),
-                p.getUsuario().getCodigoUniversitario(),
-                sdf.format(p.getFechaDevolucionEstimada()),
-                p.getEstado().toString()
-            });
-        }
-        return generarPDF("Prestamos penalizados al " + sdf.format(new Date()),
-            new String[]{"Libro", "Usuario", "Codigo", "Vencia", "Estado"}, filas,
-            new float[]{30, 25, 15, 15, 15});
-    }
-
-    public byte[] generarExcelPrestamosPenalizados() {
-        List<Prestamo> penalizados = prestamoDAO.findPrestamosPenalizados();
-        List<Object[]> datos = new ArrayList<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        for (Prestamo p : penalizados) {
-            datos.add(new Object[]{
-                p.getLibro().getTitulo(),
-                p.getUsuario().getNombre(),
-                p.getUsuario().getCodigoUniversitario(),
-                sdf.format(p.getFechaDevolucionEstimada()),
-                p.getEstado().toString()
-            });
-        }
-        return generarExcel("Prestamos penalizados",
-            new String[]{"Libro", "Usuario", "Codigo", "Vencia", "Estado"}, datos);
-    }
 
     private byte[] generarExcel(String tituloHoja, String[] columnas, List<Object[]> filas) {
         try (Workbook wb = new XSSFWorkbook();
@@ -252,13 +296,11 @@ public class ReporteService {
 
             Sheet sheet = wb.createSheet(tituloHoja);
 
-            // Estilo para encabezados
             CellStyle estiloHeader = wb.createCellStyle();
             Font fontHeader = wb.createFont();
             fontHeader.setBold(true);
             estiloHeader.setFont(fontHeader);
 
-            // Encabezados
             Row headerRow = sheet.createRow(0);
             for (int i = 0; i < columnas.length; i++) {
                 Cell cell = headerRow.createCell(i);
@@ -266,7 +308,6 @@ public class ReporteService {
                 cell.setCellStyle(estiloHeader);
             }
 
-            // Datos
             int rowIdx = 1;
             for (Object[] fila : filas) {
                 Row row = sheet.createRow(rowIdx++);
@@ -275,7 +316,6 @@ public class ReporteService {
                 }
             }
 
-            // Auto-ajustar columnas
             for (int i = 0; i < columnas.length; i++) {
                 sheet.autoSizeColumn(i);
             }

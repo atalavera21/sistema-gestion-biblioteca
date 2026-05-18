@@ -10,12 +10,11 @@
                   header="#{adminBean.libroEdicion.id != null ? 'Editar: '.concat(adminBean.libroEdicion.titulo) : 'Editar Libro'}"
                   width="900" modal="true" closable="true" resizable="false"
                   showEffect="fade" hideEffect="fade"
-                  styleClass="modal-admin"
-                  onHide="#{adminBean.cerrarEditor()}">
+                  styleClass="modal-admin">
             <p:outputPanel rendered="#{adminBean.libroEdicion.id != null}" layout="block">
                 <div class="modal-admin-body">
-                    <div class="crud-layout" style="gap:28px;">
-                        <div class="crud-preview" style="position:static; top:auto;">
+                    <div class="crud-layout">
+                        <div class="crud-preview">
                             <div class="crud-preview-label">Vista Previa</div>
                             <h:panelGroup id="previewEditarPanel" layout="block">
                                 <div class="preview-card">
@@ -45,7 +44,7 @@
                                 </div>
                             </h:panelGroup>
                         </div>
-                        <div class="crud-form" style="gap:12px;">
+                        <div class="crud-form">
                             <div class="form-section">
                                 <div class="form-section-title"><i class="pi pi-info-circle"></i> Información</div>
                                 <div class="admin-form-group">
@@ -142,38 +141,6 @@
                                                  styleClass="btn-secondary" immediate="true"/>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </p:outputPanel>
-        </p:dialog>
-    </h:form>
-
-    <!-- ===== MODAL: ELIMINAR ===== -->
-    <h:form id="dlgEliminar">
-        <p:dialog id="dlgEliminarWidget" widgetVar="dlgEliminar"
-                  header="Confirmar Eliminación"
-                  width="480" modal="true" closable="true" resizable="false"
-                  showEffect="fade" hideEffect="fade"
-                  styleClass="modal-admin modal-delete">
-            <p:outputPanel rendered="#{adminBean.libroAEliminar != null}" layout="block">
-                <div class="modal-delete-body">
-                    <div class="modal-delete-icon"><i class="pi pi-exclamation-triangle"></i></div>
-                    <h3>¿Eliminar este libro?</h3>
-                    <p class="modal-delete-book">
-                        <strong>#{adminBean.libroAEliminar.titulo}</strong>
-                        <span class="modal-delete-author">por #{adminBean.libroAEliminar.autor}</span>
-                        <span class="modal-delete-cat">#{adminBean.libroAEliminar.categoria.nombre}</span>
-                    </p>
-                    <p class="modal-delete-warning">Esta acción no se puede deshacer.</p>
-                    <div class="modal-delete-actions">
-                        <p:commandButton value="Sí, Eliminar" icon="pi pi-trash"
-                                         action="#{adminBean.ejecutarEliminar()}"
-                                         update=":tablaAdmin :libros :mensajesAdmin :formMsgs"
-                                         oncomplete="PF('dlgEliminar').hide()"
-                                         styleClass="btn-delete btn-delete-confirm"/>
-                        <p:commandButton value="Cancelar" icon="pi pi-times"
-                                         onclick="PF('dlgEliminar').hide()"
-                                         styleClass="btn-secondary" immediate="true"/>
                     </div>
                 </div>
             </p:outputPanel>

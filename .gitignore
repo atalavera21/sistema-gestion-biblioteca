@@ -31,6 +31,7 @@ Thumbs.db
 
 # Progreso local (no se sube a GitHub)
 PROGRESO.md
+DIAGNOSTICO-DEPLOY.md
 
 # Referencia local del PDF (optimizacion para agente)
 docs/PDSD-644_REQUISITOS.md
@@ -39,3 +40,9 @@ docs/PDSD-644_REQUISITOS.md
 descargas/
 diseño/
 scripts/
+
+# Herramientas y archivos de trabajo locales
+.claude/
+HashGenerator.java
+fix_hash.sql
+query

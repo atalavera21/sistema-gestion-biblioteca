@@ -25,16 +25,6 @@
                 <p:growl id="growlPrestamos" showDetail="true" life="4000"/>
             </h:form>
 
-            <h:form id="formConfirmacionPrestamos">
-                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade"
-                                 responsive="true" width="420" styleClass="confirm-dialog">
-                    <p:commandButton value="Confirmar" type="button"
-                                     styleClass="ui-confirmdialog-yes btn-primary" icon="pi pi-check"/>
-                    <p:commandButton value="Cancelar" type="button"
-                                     styleClass="ui-confirmdialog-no btn-secondary" icon="pi pi-times"/>
-                </p:confirmDialog>
-            </h:form>
-
             <!-- Préstamos Activos -->
             <div class="admin-card">
                 <h2 class="admin-card-header">
@@ -46,10 +36,10 @@
                                  emptyMessage="No tienes préstamos activos."
                                  styleClass="admin-table"
                                  sortMode="multiple">
-                        <p:column headerText="Libro" sortBy="#{p.libro.titulo}" style="width:28%">
+                        <p:column headerText="Libro" sortBy="#{p.libro.titulo}" style="width:34%">
                             <div class="cell-title"><span class="cell-text">#{p.libro.titulo}</span></div>
                         </p:column>
-                        <p:column headerText="Fecha Préstamo" sortBy="#{p.fechaPrestamo}" style="width:18%">
+                        <p:column headerText="Fecha Préstamo" sortBy="#{p.fechaPrestamo}" style="width:22%">
                             <span class="cell-date">
                                 <i class="pi pi-calendar" style="color:#1B3A4B; margin-right:6px; font-size:0.8rem;"/>
                                 <h:outputText value="#{p.fechaPrestamo}">
@@ -57,7 +47,7 @@
                                 </h:outputText>
                             </span>
                         </p:column>
-                        <p:column headerText="Devolver antes de" sortBy="#{p.fechaDevolucionEstimada}" style="width:18%">
+                        <p:column headerText="Devolver antes de" sortBy="#{p.fechaDevolucionEstimada}" style="width:22%">
                             <span class="cell-date">
                                 <i class="pi pi-calendar-times" style="color:#C9A96E; margin-right:6px; font-size:0.8rem;"/>
                                 <h:outputText value="#{p.fechaDevolucionEstimada}">
@@ -65,18 +55,8 @@
                                 </h:outputText>
                             </span>
                         </p:column>
-                        <p:column headerText="Estado" style="width:16%">
+                        <p:column headerText="Estado" style="width:22%">
                             <span class="cell-estado estado-#{p.estado.toString().toLowerCase()}">#{p.estado}</span>
-                        </p:column>
-                        <p:column headerText="Acción" style="width:20%; text-align:center;">
-                            <p:commandButton value="Devolver" icon="pi pi-check"
-                                             action="#{prestamoBean.registrarDevolucion(p.id)}"
-                                             update="@form :mensajesPrestamos"
-                                             styleClass="btn-edit">
-                                <p:confirm header="Confirmar devolución"
-                                           message="¿Confirmas la devolución de '#{p.libro.titulo}'?"
-                                           icon="pi pi-exclamation-triangle"/>
-                            </p:commandButton>
                         </p:column>
                     </p:dataTable>
                 </h:form>
@@ -123,11 +103,11 @@
                                     </p:commandLink>
                                 </ui:repeat>
                                 <span style="font-family:Inter,sans-serif; font-size:0.65rem; color:#6b7796; margin-left:4px;">
-                                    #{prestamoBean.ratingActual(p.libro.id, authBean.codigo) gt 0 ? prestamoBean.ratingActual(p.libro.id, authBean.codigo).concat('/5') : '—'}
+                                    #{prestamoBean.ratingActual(p.libro.id, authBean.codigo) gt 0 ? (prestamoBean.ratingActual(p.libro.id, authBean.codigo) += '/5') : '—'}
                                 </span>
                             </h:panelGroup>
                             <h:panelGroup rendered="#{p.estado != 'DEVUELTO' and p.estado != 'PENALIZADO'}" layout="block">
-                                <span style="font-family:Inter,sans-serif; font-size:0.65rem; color:#4B5563;">Devuelve para valorar</span>
+                                <span style="font-family:Inter,sans-serif; font-size:0.65rem; color:#4B5563;">Disponible al devolver</span>
                             </h:panelGroup>
                         </p:column>
                     </p:dataTable>

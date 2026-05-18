@@ -103,6 +103,35 @@ public class PrestamoDAO {
             .getResultList();
     }
 
+    public List<Object[]> findLibrosMasPrestadosDetalle(int limite) {
+        return em.createQuery(
+            "SELECT l.titulo, l.autor, c.nombre, l.stockTotal, COUNT(p) AS total " +
+            "FROM Prestamo p JOIN p.libro l JOIN l.categoria c " +
+            "GROUP BY l.id, l.titulo, l.autor, c.nombre, l.stockTotal " +
+            "ORDER BY total DESC",
+            Object[].class)
+            .setMaxResults(limite)
+            .getResultList();
+    }
+
+    public List<Object[]> findPrestamosPorMes(int anio) {
+        return em.createQuery(
+            "SELECT MONTH(p.fechaPrestamo), COUNT(p) FROM Prestamo p " +
+            "WHERE YEAR(p.fechaPrestamo) = :anio " +
+            "GROUP BY MONTH(p.fechaPrestamo) ORDER BY MONTH(p.fechaPrestamo)",
+            Object[].class)
+            .setParameter("anio", anio)
+            .getResultList();
+    }
+
+    public List<Integer> findAniosConPrestamos() {
+        return em.createQuery(
+            "SELECT DISTINCT YEAR(p.fechaPrestamo) FROM Prestamo p " +
+            "ORDER BY YEAR(p.fechaPrestamo) DESC",
+            Integer.class)
+            .getResultList();
+    }
+
     public List<Prestamo> findPrestamosPenalizados() {
         return em.createQuery(
             "SELECT p FROM Prestamo p JOIN FETCH p.libro JOIN FETCH p.usuario WHERE p.estado = 'PENALIZADO' ORDER BY p.fechaDevolucionEstimada DESC",
@@ -117,7 +146,7 @@ public class PrestamoDAO {
             .getResultList();
     }
 
-    public List<Prestamo> searchActivos(String keyword, Long categoriaId) {
+    public List<Prestamo> searchActivos(String keyword, Long categoriaId, Long usuarioId) {
         StringBuilder jpql = new StringBuilder(
             "SELECT DISTINCT p FROM Prestamo p JOIN FETCH p.libro JOIN FETCH p.usuario WHERE p.estado = 'ACTIVO'");
         if (keyword != null && !keyword.isBlank()) {
@@ -125,6 +154,9 @@ public class PrestamoDAO {
         }
         if (categoriaId != null) {
             jpql.append(" AND p.libro.categoria.id = :catId");
+        }
+        if (usuarioId != null) {
+            jpql.append(" AND p.usuario.id = :usuarioId");
         }
         jpql.append(" ORDER BY p.fechaPrestamo DESC");
 
@@ -134,6 +166,9 @@ public class PrestamoDAO {
         }
         if (categoriaId != null) {
             query.setParameter("catId", categoriaId);
+        }
+        if (usuarioId != null) {
+            query.setParameter("usuarioId", usuarioId);
         }
         return query.getResultList();
     }

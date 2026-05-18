@@ -6,6 +6,8 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 <h:head>
     <title><ui:insert name="titulo">Biblioteca SENATI</ui:insert></title>
+    <meta name="theme-color" content="#0D1520"/>
+    <style>html,body{background:#0D1520;}</style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
     <h:outputStylesheet library="css" name="estilos.css"/>
 </h:head>
@@ -16,13 +18,14 @@
     <!-- ================================================================ -->
     <nav class="navbar">
         <div class="navbar-inner">
-            <a href="/sistema-gestion-biblioteca/index.xhtml" class="navbar-brand">
+            <a href="#{authBean.autenticado ? (authBean.rol == 'ADMIN' ? '/sistema-gestion-biblioteca/admin/index.xhtml' : '/sistema-gestion-biblioteca/catalogo.xhtml') : '/sistema-gestion-biblioteca/index.xhtml'}" class="navbar-brand">
                 <span class="navbar-logo">
-                    <i class="pi pi-book"></i>
+                    <h:graphicImage library="images" name="Senati-Logo.png"
+                                    alt="SENATI" styleClass="navbar-logo-img"/>
                 </span>
                 <span class="navbar-name">
-                    <span class="navbar-name-main">Biblioteca</span>
-                    <span class="navbar-name-sub">SENATI</span>
+                    <span class="navbar-name-main">Biblioteca SENATI</span>
+                    <span class="navbar-name-sub">Sistema Bibliotecario</span>
                 </span>
             </a>
 
@@ -69,7 +72,8 @@
                         </div>
                         <span class="navbar-username">#{authBean.codigo}</span>
                         <h:form style="display:contents;">
-                            <h:commandButton styleClass="navbar-logout" value="Salir"
+                            <p:commandButton styleClass="navbar-logout" value="Salir"
+                                             icon="pi pi-sign-out" ajax="false"
                                              action="#{authBean.logout()}"/>
                         </h:form>
                     </div>
@@ -181,10 +185,43 @@
     <!-- FOOTER FIJO                                                       -->
     <!-- ================================================================ -->
     <footer class="footer">
-        <div class="footer-inner">
-            <span class="footer-decor">✦</span>
-            <span class="footer-text">Desarrollado por Adrián Talavera</span>
-            <span class="footer-decor">✦</span>
+        <div class="footer-main">
+            <div class="footer-col footer-col-brand">
+                <div class="footer-brand-row">
+                    <span class="footer-logo">
+                        <h:graphicImage library="images" name="Senati-Logo.png"
+                                        alt="SENATI" styleClass="footer-logo-img"/>
+                    </span>
+                    <span class="footer-brand-name">Biblioteca SENATI</span>
+                </div>
+                <p class="footer-about">
+                    Plataforma de gestión bibliotecaria para la consulta del catálogo,
+                    el préstamo de ejemplares y el seguimiento de devoluciones de la
+                    comunidad SENATI.
+                </p>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-col-title">Navegación</h4>
+                <a href="/sistema-gestion-biblioteca/catalogo.xhtml" class="footer-link">Catálogo</a>
+                <a href="/sistema-gestion-biblioteca/prestamos.xhtml" class="footer-link">Mis Préstamos</a>
+                <a href="/sistema-gestion-biblioteca/index.xhtml" class="footer-link">Inicio</a>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-col-title">Atención</h4>
+                <span class="footer-info">Lunes a Viernes</span>
+                <span class="footer-info">08:00 — 20:00 h</span>
+                <span class="footer-info">Sábados · 09:00 — 13:00 h</span>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-col-title">Contacto</h4>
+                <span class="footer-info">biblioteca@senati.pe</span>
+                <span class="footer-info">(01) 208-9999</span>
+                <span class="footer-info">Av. Alfredo Mendiola 3520, Lima</span>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span class="footer-copy">© 2026 Biblioteca SENATI · Todos los derechos reservados</span>
+            <span class="footer-dev">Desarrollado por <strong>Adrián Talavera</strong></span>
         </div>
     </footer>
 

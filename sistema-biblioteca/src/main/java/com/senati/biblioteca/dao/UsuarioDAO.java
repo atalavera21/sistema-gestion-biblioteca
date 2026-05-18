@@ -29,6 +29,12 @@ public class UsuarioDAO {
                  .getResultList();
     }
 
+    public List<Usuario> findEstudiantes() {
+        return em.createQuery(
+            "SELECT u FROM Usuario u WHERE u.rol = 'ESTUDIANTE' ORDER BY u.nombre", Usuario.class)
+                 .getResultList();
+    }
+
     public List<Usuario> findPenalizados() {
         return em.createQuery("SELECT u FROM Usuario u WHERE u.penalizado = true", Usuario.class)
                  .getResultList();

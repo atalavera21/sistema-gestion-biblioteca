@@ -20,16 +20,12 @@
             <div class="admin-page-header">
                 <div class="admin-module-heading">
                     <div class="admin-breadcrumb">
-                        <a href="/sistema-gestion-biblioteca/admin/index.xhtml">Panel de administracion</a>
+                        <a href="/sistema-gestion-biblioteca/admin/index.xhtml">Panel de Administración</a>
                         <i class="pi pi-angle-right"/>
-                        <span>Gestion de libros</span>
+                        <span>Gestión de Libros</span>
                     </div>
-                    <h1 class="page-title admin-page-title">Gestion de Libros</h1>
-                    <p class="admin-page-subtitle">Administra el catalogo, controla prestamos activos y registra devoluciones pendientes desde esta vista.</p>
-                </div>
-                <div>
-                    <h1 class="page-title admin-page-title">Panel de Administración</h1>
-                    <p class="admin-page-subtitle">Gestión del catálogo bibliográfico</p>
+                    <h1 class="page-title admin-page-title">Gestión de Libros</h1>
+                    <p class="admin-page-subtitle">Catálogo, préstamos activos y devoluciones registradas.</p>
                 </div>
             </div>
 
@@ -47,54 +43,18 @@
                 </p:confirmDialog>
             </h:form>
 
-            <!-- ===== MENÚ PRINCIPAL: 2 BOTONES GRANDES ===== -->
-            <div class="admin-menu-grid">
-                <h:form>
-                    <p:commandLink styleClass="admin-menu-card #{empty adminBean.seccion or adminBean.seccion == 'libros' or adminBean.seccion == 'prestamos' or adminBean.seccion == 'devoluciones' ? 'admin-menu-card-active' : ''}"
-                                   action="#{adminBean.setSeccion('libros')}" update=":seccionPanel :mensajesAdmin">
-                        <span class="admin-menu-icon">
-                            <i class="pi pi-book"/>
-                        </span>
-                        <span class="admin-menu-content">
-                            <span class="admin-menu-title">Gestión de Libros</span>
-                            <span class="admin-menu-desc">Administrar catálogo, préstamos y devoluciones</span>
-                        </span>
-                    </p:commandLink>
-                </h:form>
-
-                <a href="/sistema-gestion-biblioteca/admin/reportes.xhtml" class="admin-menu-card">
-                    <span class="admin-menu-icon" style="background:rgba(201,169,110,0.15);">
-                        <i class="pi pi-chart-bar" style="color:#C9A96E;"/>
-                    </span>
-                    <span class="admin-menu-content">
-                        <span class="admin-menu-title">Reportes</span>
-                        <span class="admin-menu-desc">Generar reportes en PDF y Excel</span>
-                    </span>
+            <!-- ===== NAVEGACIÓN ENTRE MÓDULOS ===== -->
+            <div class="admin-nav admin-nav-fullwidth">
+                <span class="admin-nav-link active">
+                    <i class="pi pi-book"/> Gestión de Libros
+                </span>
+                <a href="/sistema-gestion-biblioteca/admin/reportes.xhtml" class="admin-nav-link">
+                    <i class="pi pi-chart-bar"/> Reportes
                 </a>
             </div>
 
             <!-- ===== PANEL DE SECCIONES (GESTIÓN DE LIBROS) ===== -->
             <section class="admin-section admin-section-active">
-                <div class="admin-section-header">
-                    <span class="admin-menu-icon">
-                        <i class="pi pi-book"/>
-                    </span>
-                    <span class="admin-menu-content">
-                        <span class="admin-menu-title">GestiÃ³n de Libros</span>
-                        <span class="admin-menu-desc">Administrar catÃ¡logo, prÃ©stamos y devoluciones</span>
-                    </span>
-                </div>
-
-                <div class="admin-section-header admin-section-header-clean">
-                    <span class="admin-menu-icon">
-                        <i class="pi pi-book"/>
-                    </span>
-                    <span class="admin-menu-content">
-                        <span class="admin-menu-title">Gestion de Libros</span>
-                        <span class="admin-menu-desc">Administrar catalogo, prestamos y devoluciones</span>
-                    </span>
-                </div>
-
             <h:panelGroup id="seccionPanel" rendered="#{adminBean.seccion == 'libros' or adminBean.seccion == 'prestamos' or adminBean.seccion == 'devoluciones'}" layout="block">
 
                 <!-- Sub-tabs -->
@@ -106,7 +66,7 @@
                         <p:commandButton value="Préstamos Activos" icon="pi pi-bookmark"
                                          styleClass="admin-subtab #{adminBean.seccion == 'prestamos' ? 'admin-subtab-active' : ''}"
                                          action="#{adminBean.setSeccion('prestamos')}" update=":seccionPanel :mensajesAdmin"/>
-                        <p:commandButton value="Devoluciones Pendientes" icon="pi pi-clock"
+                        <p:commandButton value="Devoluciones Registradas" icon="pi pi-undo"
                                          styleClass="admin-subtab #{adminBean.seccion == 'devoluciones' ? 'admin-subtab-active' : ''}"
                                          action="#{adminBean.setSeccion('devoluciones')}" update=":seccionPanel :mensajesAdmin"/>
                     </div>
@@ -160,7 +120,7 @@
 
                         <h:form id="tablaAdmin">
 
-                            <p:dataTable value="#{adminBean.listaLibros}" var="libro"
+                            <p:dataTable id="tablaLibros" value="#{adminBean.listaLibros}" var="libro"
                                          paginator="true" rows="10"
                                          styleClass="admin-table"
                                          paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
@@ -175,8 +135,9 @@
                                                    title="#{libro.activo ? 'Desactivar libro' : 'Activar libro'}"
                                                    styleClass="toggle-switch #{libro.activo ? 'toggle-on' : 'toggle-off'}">
                                         <f:setPropertyActionListener value="#{libro}" target="#{adminBean.libroSeleccionado}"/>
-                                        <p:confirm header="#{libro.activo ? 'Desactivar libro' : 'Activar libro'}"
-                                                   message="#{libro.activo ? 'El libro dejara de estar activo para nuevas operaciones. Deseas continuar?' : 'El libro volvera a estar activo para nuevas operaciones. Deseas continuar?'}"
+                                        <p:confirm disabled="#{not libro.activo}"
+                                                   header="Desactivar libro"
+                                                   message="El libro dejara de estar activo para nuevas operaciones. Deseas continuar?"
                                                    icon="pi pi-exclamation-triangle"/>
                                         <span class="toggle-track">
                                             <span class="toggle-thumb"/>
@@ -192,25 +153,18 @@
                                 <p:column headerText="Autor" sortBy="#{libro.autor}" style="width:18%">
                                     #{libro.autor}
                                 </p:column>
-                                <p:column headerText="Categoría" sortBy="#{libro.categoria.nombre}" style="width:13%">
+                                <p:column headerText="Categoría" sortBy="#{libro.categoria.nombre}" style="width:16%">
                                     <span class="cell-badge">#{libro.categoria.nombre}</span>
                                 </p:column>
                                 <p:column headerText="Stock" sortBy="#{libro.stockTotal}" style="width:8%; text-align:center;">
                                     <span class="cell-stock">#{libro.stockTotal}</span>
                                 </p:column>
-                                <p:column headerText="Acciones" style="width:23%; text-align:center;">
-                                    <div class="cell-actions">
-                                        <p:commandButton value="Editar" icon="pi pi-pencil"
-                                                         action="#{adminBean.editarLibro(libro)}"
-                                                         update=":dlgEditor"
-                                                         oncomplete="PF('dlgEditor').show()"
-                                                         styleClass="btn-edit"/>
-                                        <p:commandButton value="Eliminar" icon="pi pi-trash"
-                                                         action="#{adminBean.prepararEliminar(libro)}"
-                                                         update=":dlgEliminar"
-                                                         oncomplete="PF('dlgEliminar').show()"
-                                                         styleClass="btn-delete"/>
-                                    </div>
+                                <p:column headerText="Acciones" style="width:12%; text-align:center;">
+                                    <p:commandButton value="Editar" icon="pi pi-pencil"
+                                                     action="#{adminBean.editarLibro(libro)}"
+                                                     update=":dlgEditor"
+                                                     oncomplete="PF('dlgEditor').show()"
+                                                     styleClass="btn-row-edit"/>
                                 </p:column>
                             </p:dataTable>
                         </h:form>
@@ -240,6 +194,12 @@
                                     <f:selectItems value="#{adminBean.categorias}" var="cat"
                                                    itemLabel="#{cat.nombre}" itemValue="#{cat.id}"/>
                                 </p:selectOneMenu>
+                                <p:selectOneMenu value="#{adminBean.filtroUsuarioId}" styleClass="filter-select"
+                                                 filter="true" filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Todos los usuarios" noSelectionOption="true"/>
+                                    <f:selectItems value="#{adminBean.usuarios}" var="u"
+                                                   itemLabel="#{u.nombre} (#{u.codigoUniversitario})" itemValue="#{u.id}"/>
+                                </p:selectOneMenu>
                                 <p:selectBooleanCheckbox value="#{adminBean.filtroConStock}" itemLabel="Con stock"/>
                                 <p:commandButton value="Buscar" icon="pi pi-search"
                                                  action="#{adminBean.buscarPrestamos()}"
@@ -267,74 +227,121 @@
                                         <span class="cell-text">#{p.libro.titulo}</span>
                                     </div>
                                 </p:column>
-                                <p:column headerText="Usuario" sortBy="#{p.usuario.nombre}" style="width:20%">
+                                <p:column headerText="Usuario" sortBy="#{p.usuario.nombre}" style="width:19%">
                                     #{p.usuario.nombre}
                                 </p:column>
                                 <p:column headerText="Categoría" sortBy="#{p.libro.categoria.nombre}" style="width:13%">
                                     <span class="cell-badge">#{p.libro.categoria.nombre}</span>
                                 </p:column>
-                                <p:column headerText="Préstamo" sortBy="#{p.fechaPrestamo}" style="width:15%">
+                                <p:column headerText="Préstamo" sortBy="#{p.fechaPrestamo}" style="width:13%">
                                     <span class="cell-date">
                                         <h:outputText value="#{p.fechaPrestamo}">
                                             <f:convertDateTime pattern="dd/MM/yyyy" type="date"/>
                                         </h:outputText>
                                     </span>
                                 </p:column>
-                                <p:column headerText="Devolver antes" sortBy="#{p.fechaDevolucionEstimada}" style="width:18%">
-                                    <span class="cell-date">
+                                <p:column headerText="Devolver antes" sortBy="#{p.fechaDevolucionEstimada}" style="width:14%">
+                                    <span class="semaforo-badge semaforo-#{adminBean.getSemaforoFecha(p)}">
                                         <h:outputText value="#{p.fechaDevolucionEstimada}">
                                             <f:convertDateTime pattern="dd/MM/yyyy" type="date"/>
                                         </h:outputText>
                                     </span>
+                                </p:column>
+                                <p:column headerText="Acción" style="width:16%; text-align:center;">
+                                    <p:commandButton value="Devolver" icon="pi pi-replay"
+                                                     styleClass="btn-devolver"
+                                                     action="#{adminBean.registrarDevolucionRapida(p.id)}"
+                                                     update="tablaPrestamosActivos :formDevoluciones:tablaDevoluciones :mensajesAdmin"
+                                                     title="Registrar devolución de este préstamo">
+                                        <p:confirm header="Registrar Devolución"
+                                                   message="¿Confirmar devolución de '#{p.libro.titulo}' por #{p.usuario.nombre}?"
+                                                   icon="pi pi-question-circle"/>
+                                    </p:commandButton>
                                 </p:column>
                             </p:dataTable>
                         </h:form>
                     </div>
                 </h:panelGroup>
 
-                <!-- ============ SECCIÓN 3: DEVOLUCIONES PENDIENTES ============ -->
+                <!-- ============ SECCIÓN 3: DEVOLUCIONES REGISTRADAS ============ -->
                 <h:panelGroup rendered="#{adminBean.seccion == 'devoluciones'}" layout="block">
-                    <div class="admin-card admin-card-overdue">
+                    <div class="admin-card">
                         <div class="table-header-bar">
                             <h2 class="admin-card-header" style="margin-bottom:0; padding-bottom:0; border-bottom:none;">
-                                <span class="admin-card-icon-overdue"><i class="pi pi-exclamation-triangle"/></span>
-                                Devoluciones Pendientes
+                                <span class="admin-card-icon"><i class="pi pi-undo"/></span>
+                                Devoluciones Registradas
                             </h2>
-                            <span class="table-count table-count-danger">#{adminBean.devolucionesPendientes.size()} pendiente(s)</span>
+                            <span class="table-count">#{adminBean.devolucionesRegistradas.size()} registro(s)</span>
                         </div>
 
+                        <h:form id="formFiltrosDevoluciones">
+                            <div class="filter-bar">
+                                <div class="filter-input-group">
+                                    <i class="pi pi-search filter-input-icon"/>
+                                    <p:inputText value="#{adminBean.keywordDevoluciones}"
+                                                 placeholder="Buscar por libro, autor o usuario..."
+                                                 styleClass="filter-input"/>
+                                </div>
+                                <p:selectOneMenu value="#{adminBean.filtroCategoriaIdDevoluciones}" styleClass="filter-select">
+                                    <f:selectItem itemLabel="Todas las categorías" noSelectionOption="true"/>
+                                    <f:selectItems value="#{adminBean.categorias}" var="cat"
+                                                   itemLabel="#{cat.nombre}" itemValue="#{cat.id}"/>
+                                </p:selectOneMenu>
+                                <p:calendar value="#{adminBean.fechaInicioDevoluciones}" placeholder="Desde"
+                                            pattern="dd/MM/yyyy" styleClass="filter-date"/>
+                                <p:calendar value="#{adminBean.fechaFinDevoluciones}" placeholder="Hasta"
+                                            pattern="dd/MM/yyyy" styleClass="filter-date"/>
+                                <p:selectBooleanCheckbox value="#{adminBean.soloRetrasoDevoluciones}" itemLabel="Solo con retraso"/>
+                                <p:commandButton value="Buscar" icon="pi pi-search"
+                                                 action="#{adminBean.buscarDevoluciones()}"
+                                                 update=":formDevoluciones:tablaDevoluciones :mensajesAdmin"
+                                                 styleClass="btn-primary" style="height:40px !important;"/>
+                                <p:commandButton value="Limpiar" icon="pi pi-times"
+                                                 action="#{adminBean.limpiarFiltrosDevoluciones()}"
+                                                 update="@form :formDevoluciones:tablaDevoluciones :mensajesAdmin"
+                                                 styleClass="btn-secondary" style="height:40px !important;"/>
+                            </div>
+                        </h:form>
+
                         <h:form id="formDevoluciones">
-                            <p:dataTable value="#{adminBean.devolucionesPendientes}" var="p"
+                            <p:dataTable id="tablaDevoluciones" value="#{adminBean.devolucionesRegistradas}" var="d"
                                          paginator="true" rows="10"
-                                         styleClass="admin-table admin-table-overdue"
+                                         styleClass="admin-table"
                                          paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                          currentPageReportTemplate="{currentPage} de {totalPages}"
                                          rowsPerPageTemplate="10,25,50"
-                                         emptyMessage="No hay devoluciones pendientes."
+                                         emptyMessage="No hay devoluciones registradas."
                                          sortMode="multiple">
 
-                                <p:column headerText="Vencimiento" sortBy="#{p.fechaDevolucionEstimada}" style="width:12%; text-align:center;">
-                                    <div class="overdue-days">
-                                        <span class="overdue-days-num">#{adminBean.getDiasVencidos(p)}</span>
-                                        <span class="overdue-days-label">días</span>
-                                    </div>
-                                </p:column>
-                                <p:column headerText="Libro" sortBy="#{p.libro.titulo}" style="width:24%">
-                                    <div class="cell-title">
-                                        <span class="cell-text">#{p.libro.titulo}</span>
-                                    </div>
-                                </p:column>
-                                <p:column headerText="Usuario" sortBy="#{p.usuario.nombre}" style="width:20%">
-                                    #{p.usuario.nombre}
-                                </p:column>
-                                <p:column headerText="Categoría" sortBy="#{p.libro.categoria.nombre}" style="width:13%">
-                                    <span class="cell-badge cell-badge-danger">#{p.libro.categoria.nombre}</span>
-                                </p:column>
-                                <p:column headerText="Vencía el" sortBy="#{p.fechaDevolucionEstimada}" style="width:20%">
-                                    <span class="cell-date cell-date-danger">
-                                        <h:outputText value="#{p.fechaDevolucionEstimada}">
+                                <p:column headerText="Fecha" sortBy="#{d.fechaDevolucion}" style="width:12%">
+                                    <span class="cell-date">
+                                        <h:outputText value="#{d.fechaDevolucion}">
                                             <f:convertDateTime pattern="dd/MM/yyyy" type="date"/>
                                         </h:outputText>
+                                    </span>
+                                </p:column>
+                                <p:column headerText="Libro" sortBy="#{d.prestamo.libro.titulo}" style="width:22%">
+                                    <div class="cell-title">
+                                        <span class="cell-text">#{d.prestamo.libro.titulo}</span>
+                                    </div>
+                                </p:column>
+                                <p:column headerText="Autor" sortBy="#{d.prestamo.libro.autor}" style="width:15%">
+                                    #{d.prestamo.libro.autor}
+                                </p:column>
+                                <p:column headerText="Usuario" sortBy="#{d.prestamo.usuario.nombre}" style="width:18%">
+                                    #{d.prestamo.usuario.nombre}
+                                </p:column>
+                                <p:column headerText="Categoría" sortBy="#{d.prestamo.libro.categoria.nombre}" style="width:12%">
+                                    <span class="cell-badge">#{d.prestamo.libro.categoria.nombre}</span>
+                                </p:column>
+                                <p:column headerText="Días retraso" sortBy="#{d.diasRetraso}" style="width:10%; text-align:center;">
+                                    <span class="#{d.diasRetraso > 0 ? 'overdue-days-num' : 'cell-stock'}">
+                                        #{d.diasRetraso}
+                                    </span>
+                                </p:column>
+                                <p:column headerText="Estado" sortBy="#{d.aTiempo}" style="width:11%; text-align:center;">
+                                    <span class="cell-badge #{d.aTiempo ? 'cell-badge-success' : 'cell-badge-danger'}">
+                                        #{d.aTiempo ? 'A tiempo' : 'Con retraso'}
                                     </span>
                                 </p:column>
                             </p:dataTable>
@@ -358,11 +365,10 @@
                       header="Registrar Nuevo Libro"
                       width="900" modal="true" closable="true" resizable="false"
                       showEffect="fade" hideEffect="fade"
-                      styleClass="modal-admin"
-                      onHide="#{adminBean.cerrarEditor()}">
+                      styleClass="modal-admin">
                 <div class="modal-admin-body">
-                    <div class="crud-layout" style="gap:28px;">
-                        <div class="crud-preview" style="position:static; top:auto;">
+                    <div class="crud-layout">
+                        <div class="crud-preview">
                             <div class="crud-preview-label">Vista Previa</div>
                             <h:panelGroup id="previewCrearPanel" layout="block">
                                 <div class="preview-card">
@@ -392,7 +398,7 @@
                                 </div>
                             </h:panelGroup>
                         </div>
-                        <div class="crud-form" style="gap:12px;">
+                        <div class="crud-form">
                             <div class="form-section">
                                 <div class="form-section-title"><i class="pi pi-info-circle"/> Información</div>
                                 <div class="admin-form-group">
@@ -489,7 +495,7 @@
                             <div class="form-actions" style="margin-top:4px;">
                                 <p:commandButton value="Registrar Libro" icon="pi pi-check"
                                                  action="#{adminBean.crearLibro()}"
-                                                 update="tablaAdmin mensajesAdmin"
+                                                 update=":tablaAdmin :mensajesAdmin"
                                                  oncomplete="PF('dlgCrearWidget').hide()"
                                                  styleClass="btn-primary"/>
                                 <p:commandButton value="Cancelar" icon="pi pi-times"

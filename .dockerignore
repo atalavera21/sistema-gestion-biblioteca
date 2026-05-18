@@ -1,0 +1,8 @@
+# Archivos que Docker NO necesita para construir la imagen.
+# Mantenerlos fuera acelera el build.
+.git
+**/target
+.claude
+docs
+*.bak
+*.md

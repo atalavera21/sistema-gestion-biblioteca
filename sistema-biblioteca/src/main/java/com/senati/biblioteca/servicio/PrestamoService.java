@@ -1,8 +1,10 @@
 package com.senati.biblioteca.servicio;
 
+import com.senati.biblioteca.dao.DevolucionDAO;
 import com.senati.biblioteca.dao.LibroDAO;
 import com.senati.biblioteca.dao.PrestamoDAO;
 import com.senati.biblioteca.dao.UsuarioDAO;
+import com.senati.biblioteca.modelo.Devolucion;
 import com.senati.biblioteca.modelo.EstadoPrestamo;
 import com.senati.biblioteca.modelo.Libro;
 import com.senati.biblioteca.modelo.Prestamo;
@@ -27,6 +29,9 @@ public class PrestamoService {
 
     @Inject
     private NotificacionService notificacionService;
+
+    @Inject
+    private DevolucionDAO devolucionDAO;
 
     public Prestamo registrarPrestamo(String codigoUniversitario, Long libroId) {
         Usuario usuario = usuarioDAO.findByCodigoUniversitario(codigoUniversitario)
@@ -65,22 +70,38 @@ public class PrestamoService {
             throw new IllegalArgumentException("Prestamo no encontrado.");
         }
 
-        prestamo.setFechaDevolucionReal(new Date());
+        Date ahora = new Date();
+        prestamo.setFechaDevolucionReal(ahora);
         Usuario usuario = prestamo.getUsuario();
 
-        if (new Date().after(prestamo.getFechaDevolucionEstimada())) {
+        int diasRetraso = 0;
+        boolean conRetraso = false;
+
+        if (ahora.after(prestamo.getFechaDevolucionEstimada())) {
             prestamo.setEstado(EstadoPrestamo.PENALIZADO);
             usuario.setPenalizado(true);
             ajustarPuntuacion(usuario, -5.0);
             usuarioDAO.save(usuario);
             notificacionService.notificarPenalizacion(usuario.getCodigoUniversitario());
+            long diff = ahora.getTime() - prestamo.getFechaDevolucionEstimada().getTime();
+            diasRetraso = (int) (diff / (1000 * 60 * 60 * 24));
+            conRetraso = true;
         } else {
             prestamo.setEstado(EstadoPrestamo.DEVUELTO);
             ajustarPuntuacion(usuario, +2.0);
             usuarioDAO.save(usuario);
         }
 
-        return prestamoDAO.save(prestamo);
+        Prestamo guardado = prestamoDAO.save(prestamo);
+
+        Devolucion devolucion = new Devolucion();
+        devolucion.setPrestamo(guardado);
+        devolucion.setFechaDevolucion(ahora);
+        devolucion.setDiasRetraso(diasRetraso);
+        devolucion.setaTiempo(!conRetraso);
+        devolucionDAO.guardar(devolucion);
+
+        return guardado;
     }
 
     public List<Prestamo> buscarPrestamosPorUsuario(String codigoUniversitario) {
@@ -103,8 +124,8 @@ public class PrestamoService {
         return prestamoDAO.findAllActivos();
     }
 
-    public List<Prestamo> buscarPrestamosActivosConFiltros(String keyword, Long categoriaId) {
-        return prestamoDAO.searchActivos(keyword, categoriaId);
+    public List<Prestamo> buscarPrestamosActivosConFiltros(String keyword, Long categoriaId, Long usuarioId) {
+        return prestamoDAO.searchActivos(keyword, categoriaId, usuarioId);
     }
 
     public List<Prestamo> buscarDevolucionesPendientes() {
@@ -132,5 +153,13 @@ public class PrestamoService {
         double actual = usuario.getPuntuacion() != null ? usuario.getPuntuacion() : 50.0;
         double nueva = Math.max(0.0, Math.min(100.0, actual + delta));
         usuario.setPuntuacion(nueva);
+    }
+
+    public List<Object[]> getTopLibrosPrestados(int limite) {
+        return prestamoDAO.findLibrosMasPrestados(limite);
+    }
+
+    public List<Object[]> getTopCategorias(int limite) {
+        return prestamoDAO.findLibrosPorCategoria(limite);
     }
 }
