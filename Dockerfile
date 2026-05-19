@@ -32,7 +32,7 @@ ADD --chown=jboss:jboss \
 # Registrar el driver y crear el datasource "bibliotecaDS".
 # El script trae marcadores (__DB_USER__, __DB_PASSWORD__) que se reemplazan
 # aqui con los valores reales antes de ejecutarlo.
-COPY docker/datasource.cli /tmp/datasource.cli
+COPY --chown=jboss:jboss docker/datasource.cli /tmp/datasource.cli
 RUN sed -i "s|__DB_USER__|${DB_USER}|g; s|__DB_PASSWORD__|${DB_PASSWORD}|g" /tmp/datasource.cli \
  && /opt/jboss/wildfly/bin/jboss-cli.sh --file=/tmp/datasource.cli
 
