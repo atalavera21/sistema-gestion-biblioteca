@@ -15,7 +15,7 @@
     <h:panelGroup rendered="#{not authBean.autenticado or authBean.rol != 'ADMIN'}">
         <div class="access-denied">
             <p>Acceso denegado.</p>
-            <p><a href="/sistema-gestion-biblioteca/index.xhtml">Iniciar sesión como administrador</a></p>
+            <p><a href="#{request.contextPath}/index.xhtml">Iniciar sesión como administrador</a></p>
         </div>
     </h:panelGroup>
 
@@ -25,7 +25,7 @@
             <div class="admin-page-header">
                 <div class="admin-module-heading">
                     <div class="admin-breadcrumb">
-                        <a href="/sistema-gestion-biblioteca/admin/index.xhtml">Panel de Administración</a>
+                        <a href="#{request.contextPath}/admin/index.xhtml">Panel de Administración</a>
                         <i class="pi pi-angle-right"/>
                         <span>Reportes</span>
                     </div>
@@ -37,10 +37,10 @@
             </div>
 
             <div class="admin-nav admin-nav-fullwidth">
-                <a href="/sistema-gestion-biblioteca/admin/libros.xhtml" class="admin-nav-link">
+                <a href="#{request.contextPath}/admin/libros.xhtml" class="admin-nav-link">
                     <i class="pi pi-book"/> Gestión de Libros
                 </a>
-                <a href="/sistema-gestion-biblioteca/admin/reportes.xhtml" class="admin-nav-link active">
+                <a href="#{request.contextPath}/admin/reportes.xhtml" class="admin-nav-link active">
                     <i class="pi pi-chart-bar"/> Reportes
                 </a>
             </div>
@@ -364,7 +364,7 @@
             </script>
 
             <div class="admin-footer-link">
-                <a href="/sistema-gestion-biblioteca/admin/index.xhtml" class="btn-ghost-admin">← Volver al panel</a>
+                <a href="#{request.contextPath}/admin/index.xhtml" class="btn-ghost-admin">← Volver al panel</a>
             </div>
         </div>
     </h:panelGroup>

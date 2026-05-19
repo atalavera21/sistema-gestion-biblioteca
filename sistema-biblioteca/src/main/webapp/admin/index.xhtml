@@ -15,7 +15,7 @@
     <h:panelGroup rendered="#{not authBean.autenticado or authBean.rol != 'ADMIN'}">
         <div class="access-denied">
             <p>Acceso denegado.</p>
-            <p><a href="/sistema-gestion-biblioteca/index.xhtml">Iniciar sesion como administrador</a></p>
+            <p><a href="#{request.contextPath}/index.xhtml">Iniciar sesion como administrador</a></p>
         </div>
     </h:panelGroup>
 
@@ -39,7 +39,7 @@
             <!-- ===== DOS MÓDULOS ===== -->
             <div class="ahub-grid">
 
-                <a href="/sistema-gestion-biblioteca/admin/libros.xhtml"
+                <a href="#{request.contextPath}/admin/libros.xhtml"
                    class="ahub-card ahub-card-libros">
                     <i class="pi pi-book ahub-card-ghost"/>
                     <span class="ahub-card-tag">Módulo 01</span>
@@ -54,7 +54,7 @@
                     </span>
                 </a>
 
-                <a href="/sistema-gestion-biblioteca/admin/reportes.xhtml"
+                <a href="#{request.contextPath}/admin/reportes.xhtml"
                    class="ahub-card ahub-card-reportes">
                     <i class="pi pi-chart-bar ahub-card-ghost"/>
                     <span class="ahub-card-tag">Módulo 02</span>

@@ -143,7 +143,7 @@
                                         <h:outputText value="Agotado"
                                             rendered="#{catalogoBean.getDisponibilidad(libro) != 'Disponible'}"
                                             style="font-family:Inter,system-ui,sans-serif; font-size:0.75rem; color:#9E9E9E; font-weight:500;" />
-                                        <h:outputLink value="/sistema-gestion-biblioteca/index.xhtml"
+                                        <h:outputLink value="#{request.contextPath}/index.xhtml"
                                             styleClass="card-btn card-btn-solid"
                                             rendered="#{catalogoBean.getDisponibilidad(libro) == 'Disponible' and not authBean.autenticado}">
                                             Iniciar sesión

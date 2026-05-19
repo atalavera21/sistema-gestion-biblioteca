@@ -42,7 +42,7 @@ services:
         DB_PASSWORD: ${DB_PASSWORD}
     container_name: biblioteca-app
     ports:
-      - "8080:8080"                     # accesible en http://IP:8080
+      - "80:8080"                       # accesible en http://IP  (puerto 80 = HTTP por defecto)
     depends_on:
       db:
         condition: service_healthy      # arranca solo cuando MySQL esta listo

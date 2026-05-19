@@ -36,7 +36,9 @@ COPY --chown=jboss:jboss docker/datasource.cli /tmp/datasource.cli
 RUN sed -i "s|__DB_USER__|${DB_USER}|g; s|__DB_PASSWORD__|${DB_PASSWORD}|g" /tmp/datasource.cli \
  && /opt/jboss/wildfly/bin/jboss-cli.sh --file=/tmp/datasource.cli
 
-# Desplegar el .war compilado en la etapa 1
+# Desplegar el .war compilado en la etapa 1.
+# Se renombra a ROOT.war para que la app quede en la raiz ("/") y no en
+# "/sistema-gestion-biblioteca". Asi la URL no lleva ese segmento.
 COPY --chown=jboss:jboss --from=build \
     /build/target/sistema-gestion-biblioteca.war \
-    /opt/jboss/wildfly/standalone/deployments/
+    /opt/jboss/wildfly/standalone/deployments/ROOT.war

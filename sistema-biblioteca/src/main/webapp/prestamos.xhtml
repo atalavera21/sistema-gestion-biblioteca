@@ -10,7 +10,7 @@
     <h:panelGroup rendered="#{not authBean.autenticado}">
         <div class="access-denied">
             <p>Acceso denegado.</p>
-            <p><a href="/sistema-gestion-biblioteca/index.xhtml">Iniciar sesión</a></p>
+            <p><a href="#{request.contextPath}/index.xhtml">Iniciar sesión</a></p>
         </div>
     </h:panelGroup>
 
@@ -115,7 +115,7 @@
             </div>
 
             <div class="admin-footer-link">
-                <a href="/sistema-gestion-biblioteca/catalogo.xhtml" class="btn-ghost-admin">← Volver al catálogo</a>
+                <a href="#{request.contextPath}/catalogo.xhtml" class="btn-ghost-admin">← Volver al catálogo</a>
             </div>
         </div>
     </h:panelGroup>

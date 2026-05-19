@@ -18,7 +18,7 @@
     <!-- ================================================================ -->
     <nav class="navbar">
         <div class="navbar-inner">
-            <a href="#{authBean.autenticado ? (authBean.rol == 'ADMIN' ? '/sistema-gestion-biblioteca/admin/index.xhtml' : '/sistema-gestion-biblioteca/catalogo.xhtml') : '/sistema-gestion-biblioteca/index.xhtml'}" class="navbar-brand">
+            <a href="#{request.contextPath}#{authBean.autenticado ? (authBean.rol == 'ADMIN' ? '/admin/index.xhtml' : '/catalogo.xhtml') : '/index.xhtml'}" class="navbar-brand">
                 <span class="navbar-logo">
                     <h:graphicImage library="images" name="Senati-Logo.png"
                                     alt="SENATI" styleClass="navbar-logo-img"/>
@@ -30,18 +30,18 @@
             </a>
 
             <div class="navbar-links">
-                <a href="/sistema-gestion-biblioteca/catalogo.xhtml" class="navbar-link">
+                <a href="#{request.contextPath}/catalogo.xhtml" class="navbar-link">
                     <i class="pi pi-search"></i> Catálogo
                 </a>
 
                 <h:panelGroup rendered="#{authBean.autenticado and authBean.rol == 'ESTUDIANTE'}">
-                    <a href="/sistema-gestion-biblioteca/prestamos.xhtml" class="navbar-link">
+                    <a href="#{request.contextPath}/prestamos.xhtml" class="navbar-link">
                         <i class="pi pi-bookmark"></i> Mis Préstamos
                     </a>
                 </h:panelGroup>
 
                 <h:panelGroup rendered="#{authBean.autenticado and authBean.rol == 'ADMIN'}">
-                    <a href="/sistema-gestion-biblioteca/admin/index.xhtml" class="navbar-link">
+                    <a href="#{request.contextPath}/admin/index.xhtml" class="navbar-link">
                         <i class="pi pi-cog"></i> Administrar
                     </a>
                 </h:panelGroup>
@@ -81,7 +81,7 @@
 
                 <!-- No autenticado -->
                 <h:panelGroup rendered="#{not authBean.autenticado}">
-                    <a href="/sistema-gestion-biblioteca/index.xhtml" class="navbar-login-btn">
+                    <a href="#{request.contextPath}/index.xhtml" class="navbar-login-btn">
                         <i class="pi pi-sign-in"></i> Iniciar Sesión
                     </a>
                 </h:panelGroup>
@@ -165,7 +165,7 @@
             </h:panelGroup>
 
             <div class="notif-panel-footer">
-                <a href="/sistema-gestion-biblioteca/prestamos.xhtml" class="notif-see-all">
+                <a href="#{request.contextPath}/prestamos.xhtml" class="notif-see-all">
                     Mis préstamos <i class="pi pi-arrow-right"></i>
                 </a>
             </div>
@@ -202,9 +202,9 @@
             </div>
             <div class="footer-col">
                 <h4 class="footer-col-title">Navegación</h4>
-                <a href="/sistema-gestion-biblioteca/catalogo.xhtml" class="footer-link">Catálogo</a>
-                <a href="/sistema-gestion-biblioteca/prestamos.xhtml" class="footer-link">Mis Préstamos</a>
-                <a href="/sistema-gestion-biblioteca/index.xhtml" class="footer-link">Inicio</a>
+                <a href="#{request.contextPath}/catalogo.xhtml" class="footer-link">Catálogo</a>
+                <a href="#{request.contextPath}/prestamos.xhtml" class="footer-link">Mis Préstamos</a>
+                <a href="#{request.contextPath}/index.xhtml" class="footer-link">Inicio</a>
             </div>
             <div class="footer-col">
                 <h4 class="footer-col-title">Atención</h4>
