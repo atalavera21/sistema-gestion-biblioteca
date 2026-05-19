@@ -6,7 +6,8 @@
 #   Etapa 2 (wildfly) -> toma ese .war, lo despliega en WildFly y configura
 #                        el datasource de MySQL.
 #
-# El resultado es UNA imagen lista para correr la aplicacion.
+# Las credenciales NO estan en el codigo: llegan como build args desde el
+# archivo .env (ver docker-compose.yml).
 # =============================================================================
 
 # ---- Etapa 1: compilar el WAR ----
@@ -19,14 +20,21 @@ RUN mvn clean package -DskipTests -B
 # ---- Etapa 2: WildFly + la aplicacion ----
 FROM quay.io/wildfly/wildfly:35.0.1.Final-jdk17
 
+# Credenciales de la BD (inyectadas en build; ver docker-compose.yml -> build.args)
+ARG DB_USER
+ARG DB_PASSWORD
+
 # Driver JDBC de MySQL (lo necesita WildFly para el datasource)
 ADD --chown=jboss:jboss \
     https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.0.33/mysql-connector-j-8.0.33.jar \
     /tmp/mysql-connector-j.jar
 
-# Registrar el driver y crear el datasource "bibliotecaDS" dentro de la imagen
+# Registrar el driver y crear el datasource "bibliotecaDS".
+# El script trae marcadores (__DB_USER__, __DB_PASSWORD__) que se reemplazan
+# aqui con los valores reales antes de ejecutarlo.
 COPY docker/datasource.cli /tmp/datasource.cli
-RUN /opt/jboss/wildfly/bin/jboss-cli.sh --file=/tmp/datasource.cli
+RUN sed -i "s|__DB_USER__|${DB_USER}|g; s|__DB_PASSWORD__|${DB_PASSWORD}|g" /tmp/datasource.cli \
+ && /opt/jboss/wildfly/bin/jboss-cli.sh --file=/tmp/datasource.cli
 
 # Desplegar el .war compilado en la etapa 1
 COPY --chown=jboss:jboss --from=build \

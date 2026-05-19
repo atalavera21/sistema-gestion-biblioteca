@@ -32,7 +32,7 @@ Con **un comando** (`docker compose up -d --build`) Docker:
 | 1 | Hetzner | Crear el VPS |
 | 2 | Tu laptop | Conectarte por SSH |
 | 3 | VPS | Instalar Docker |
-| 4 | VPS | Traer el proyecto |
+| 4 | VPS | Traer el proyecto y crear credenciales |
 | 5 | VPS | `docker compose up -d --build` |
 | 6 | VPS | Cargar datos iniciales |
 | 7 | VPS | Abrir el puerto y verificar |
@@ -46,7 +46,9 @@ Antes del VPS, prueba TODO en tu laptop. Si funciona aquí, funciona en el VPS
 (esa es la gracia de Docker).
 
 1. Instala **Docker Desktop** para Windows (docker.com/products/docker-desktop).
-2. En la carpeta del proyecto, en PowerShell:
+2. Tu proyecto ya incluye un archivo `.env` local con claves de prueba —
+   no necesitas crearlo para probar local.
+3. En la carpeta del proyecto, en PowerShell:
    ```
    docker compose up -d --build
    ```
@@ -96,7 +98,7 @@ docker compose version
 
 ---
 
-## Fase 4 — Traer el proyecto
+## Fase 4 — Traer el proyecto y crear credenciales
 
 ```
 apt install -y git
@@ -105,7 +107,15 @@ git clone TU_REPOSITORIO_GIT biblioteca
 cd biblioteca
 ```
 
-> Si aún no subiste el proyecto a GitHub, hazlo primero (avísame si necesitas ayuda).
+Crea el archivo de credenciales. **No viene en el repositorio** (por seguridad):
+
+```
+cp .env.example .env
+nano .env
+```
+
+Define claves **fuertes y únicas** para `DB_PASSWORD` y `DB_ROOT_PASSWORD`
+(usa letras y números). Guarda con Ctrl+O, Enter, Ctrl+X.
 
 ---
 
@@ -137,15 +147,18 @@ el catálogo y los usuarios, y deja el sistema limpio:
 
 **En el VPS (Linux):**
 ```
-docker compose exec -T db mysql -u biblioteca -pREDACTED biblioteca_db < sistema-biblioteca/src/main/resources/seed-biblioteca.sql
-docker compose exec -T db mysql -u biblioteca -pREDACTED biblioteca_db < docker/reset-produccion.sql
+docker compose exec -T db sh -c 'mysql -u biblioteca -p"$MYSQL_PASSWORD" biblioteca_db' < sistema-biblioteca/src/main/resources/seed-biblioteca.sql
+docker compose exec -T db sh -c 'mysql -u biblioteca -p"$MYSQL_PASSWORD" biblioteca_db' < docker/reset-produccion.sql
 ```
 
 **Si lo pruebas local en Windows (PowerShell)** usa `Get-Content` en vez de `<`:
 ```
-Get-Content sistema-biblioteca\src\main\resources\seed-biblioteca.sql | docker compose exec -T db mysql -u biblioteca -pREDACTED biblioteca_db
-Get-Content docker\reset-produccion.sql | docker compose exec -T db mysql -u biblioteca -pREDACTED biblioteca_db
+Get-Content sistema-biblioteca\src\main\resources\seed-biblioteca.sql | docker compose exec -T db sh -c 'mysql -u biblioteca -p"$MYSQL_PASSWORD" biblioteca_db'
+Get-Content docker\reset-produccion.sql | docker compose exec -T db sh -c 'mysql -u biblioteca -p"$MYSQL_PASSWORD" biblioteca_db'
 ```
+
+> Estos comandos no llevan la contraseña escrita: la leen de adentro del
+> contenedor (`$MYSQL_PASSWORD`), que la tomó de tu `.env`.
 
 El seed carga categorías, libros y usuarios; el reset borra los préstamos de
 ejemplo, dejando el sistema limpio.
@@ -176,7 +189,7 @@ Credenciales: admin `ADM-001 / admin123`, estudiantes `EST-001..EST-005 / passwo
 
 Antes de cada presentación, para tener datos limpios:
 ```
-docker compose exec -T db mysql -u biblioteca -pREDACTED biblioteca_db < docker/reset-produccion.sql
+docker compose exec -T db sh -c 'mysql -u biblioteca -p"$MYSQL_PASSWORD" biblioteca_db' < docker/reset-produccion.sql
 ```
 
 ---
@@ -235,8 +248,8 @@ Lo vemos cuando quieras.
 
 ## Notas
 
-- Las contraseñas de la base de datos (`REDACTED`, `REDACTED`) están en
-  `docker-compose.yml` y `docker/datasource.cli`. Solo se usan entre contenedores
-  en una red privada. Si quieres cambiarlas, hazlo en **ambos** archivos.
+- Las credenciales de la base de datos viven **solo** en el archivo `.env`,
+  que está en `.gitignore` y **no se sube a GitHub**. El repositorio no
+  contiene ninguna contraseña.
 - El paso más delicado es la Fase 5 (el build). Si falla, copia el error y lo
   resolvemos — por eso conviene hacer la Fase 0 (probar local) primero.

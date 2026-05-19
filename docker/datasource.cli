@@ -1,5 +1,9 @@
 # Script de WildFly CLI: registra el driver de MySQL y crea el datasource.
 # Se ejecuta UNA vez, durante el build de la imagen (ver Dockerfile).
+#
+# __DB_USER__ y __DB_PASSWORD__ son marcadores: el Dockerfile los reemplaza
+# por los valores reales (que vienen del .env) antes de ejecutar este script.
+# Por eso aqui NO hay credenciales reales.
 
 # 1. Instalar el driver de MySQL como modulo de WildFly
 module add --name=com.mysql --resources=/tmp/mysql-connector-j.jar --dependencies=java.se
@@ -12,7 +16,7 @@ embed-server --std-out=echo
 
 # 4. Crear el datasource que la aplicacion espera (java:jboss/datasources/bibliotecaDS)
 #    El host "db" es el nombre del contenedor de MySQL en docker-compose.yml
-data-source add --name=bibliotecaDS --jndi-name=java:jboss/datasources/bibliotecaDS --driver-name=mysql --connection-url="jdbc:mysql://db:3306/biblioteca_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Lima" --user-name=biblioteca --password=REDACTED --min-pool-size=5 --max-pool-size=30
+data-source add --name=bibliotecaDS --jndi-name=java:jboss/datasources/bibliotecaDS --driver-name=mysql --connection-url="jdbc:mysql://db:3306/biblioteca_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Lima" --user-name=__DB_USER__ --password=__DB_PASSWORD__ --min-pool-size=5 --max-pool-size=30
 
 # 5. Detener el servidor embebido (la configuracion ya quedo guardada)
 stop-embedded-server
