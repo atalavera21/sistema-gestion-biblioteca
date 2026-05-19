@@ -3,7 +3,7 @@
 ## Proyecto
 
 Sistema de Gestion de Biblioteca Universitaria — curso "Gestores de Administracion Web" (PDSD-644).
-Sera subido a GitHub y desplegado (metodo por definir).
+Subido a GitHub (repositorio publico) y desplegado en produccion con Docker (Docker Compose) sobre un VPS. El estado actual y la bitacora de avance se llevan en `PROGRESO.md` (local, no se sube a GitHub) — leerlo al iniciar.
 
 ## Flujo de documentacion
 
@@ -27,9 +27,8 @@ AGENTS.md  →  README.md  →  documentacion/
 ## Contexto del estudiante
 
 - Viene de .NET, nuevo en Java. Necesita acompanamiento en el aprendizaje.
-- No tiene herramientas Java instaladas aun.
-- Fase actual: **codificacion en progreso. App funcionando en WildFly 35.**
-- Siguiente fase: implementar roles (Admin vs Estudiante), refactorizar Categoria como entidad.
+- Fase actual: **app completa y desplegada en produccion con Docker sobre un VPS.**
+- Para el estado detallado y los pendientes, leer `PROGRESO.md` al iniciar.
 
 ## Estructura del proyecto
 
@@ -190,24 +189,14 @@ Todas las consultas usan JPQL via `EntityManager` sobre entidades, no SQL nativo
 | Casos de uso (10 UCs + reglas + validadores) | Completado |
 | Stack tecnologico (versiones + deps Maven) | Completado |
 | Preguntas guia (5 preguntas del PDF) | Completado |
-| Codigo | Pendiente |
+| Codigo | Completado |
+| Despliegue (Docker Compose en VPS) | Completado |
 
 ## Fase actual y siguientes pasos
 
-**Fase actual:** Diseno completado. Documentacion lista.
+**Fase actual:** App completa, dockerizada y desplegada en produccion (Docker Compose sobre un VPS Ubuntu 24.04).
 
-**Proximo paso:** Instalar herramientas Java (JDK 17, Maven, WildFly, MySQL) y comenzar a codificar segun el orden:
-1. Configurar proyecto Maven (`pom.xml` con todas las dependencias)
-2. Crear entidades JPA
-3. Crear DAOs
-4. Crear servicios CDI
-5. Crear Managed Beans JSF
-6. Crear vistas XHTML
-7. Implementar API REST
-8. Implementar autenticacion LDAP simulada
-9. Configurar cache de segundo nivel
-10. Crear reportes
-11. Probar y desplegar
+**Estado y pendientes:** se llevan en `PROGRESO.md` (bitacora local, gitignored). El agente DEBE leer ese archivo al iniciar para saber en que se esta trabajando y desde donde retomar.
 
 ## Nota importante
 
