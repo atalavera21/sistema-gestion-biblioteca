@@ -89,10 +89,11 @@ body {
   color: #e8edf5 !important;
   background: linear-gradient(160deg, #131923 0%, #0D1520 50%, #101824 100%) fixed !important;
   min-height: 100vh;
+  padding-bottom: 168px;
 }
 
 .page-content {
-  min-height: calc(100vh - 64px);
+  min-height: calc(100vh - 64px - 168px);
 }
 
 /* ============================================================
@@ -649,28 +650,26 @@ body {
   display: block;
 }
 
-.navbar-name {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.1;
-}
-
-.navbar-name-main {
+.navbar-brand-text {
   font-family: 'Playfair Display', Georgia, serif !important;
-  font-size: 1.08rem;
+  font-size: 1.18rem;
   font-weight: 600;
   color: #FFFFFF;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.4px;
+  position: relative;
+  padding-left: 14px;
 }
 
-.navbar-name-sub {
-  font-family: 'Inter', system-ui, sans-serif !important;
-  font-size: 0.58rem;
-  font-weight: 600;
-  color: #5a6b8c;
-  text-transform: uppercase;
-  letter-spacing: 1.6px;
-  margin-top: 2px;
+.navbar-brand-text::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 22px;
+  background: linear-gradient(180deg, #C9A96E 0%, rgba(201,169,110,0.3) 100%);
+  border-radius: 1px;
 }
 
 /* Links centrales */
@@ -776,15 +775,31 @@ body {
   flex-shrink: 0;
 }
 
-.navbar-username {
+.navbar-user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  min-width: 0;
+}
+
+.navbar-user-name {
   font-family: 'Inter', system-ui, sans-serif !important;
   font-size: 0.82rem;
   font-weight: 600;
-  color: rgba(255,255,255,0.88);
-  max-width: 130px;
+  color: rgba(255,255,255,0.92);
+  max-width: 180px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.navbar-user-code {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #6b7796;
+  letter-spacing: 0.4px;
+  margin-top: 1px;
 }
 
 .navbar-logout {
@@ -3194,13 +3209,17 @@ body {
 }
 
 /* ============================================================
-     16. FOOTER (fixed, siempre visible)
+     16. FOOTER (compacto, fijo al pie de la ventana)
    ============================================================ */
 .footer {
-  position: relative;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   background: rgba(10,14,22,0.98);
+  backdrop-filter: blur(10px);
   border-top: 1px solid rgba(255,255,255,0.07);
-  margin-top: 40px;
+  z-index: 50;
 }
 
 .footer::before {
@@ -3216,29 +3235,28 @@ body {
 .footer-main {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 44px 48px 30px;
+  padding: 14px 48px 10px;
   display: grid;
-  grid-template-columns: 1.7fr 1fr 1.1fr 1.3fr;
-  gap: 44px;
+  grid-template-columns: 1.4fr 1fr 1.3fr 1.3fr;
+  gap: 32px;
 }
 
 .footer-col {
   display: flex;
   flex-direction: column;
-  gap: 11px;
+  gap: 4px;
 }
 
 .footer-brand-row {
   display: flex;
   align-items: center;
   gap: 11px;
-  margin-bottom: 2px;
 }
 
 .footer-logo {
-  width: 38px;
-  height: 38px;
-  border-radius: 9px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   background: #FFFFFF;
   display: flex;
   align-items: center;
@@ -3248,41 +3266,32 @@ body {
 }
 
 .footer-logo-img {
-  width: 29px;
-  height: 29px;
+  width: 25px;
+  height: 25px;
   object-fit: cover;
   display: block;
 }
 
 .footer-brand-name {
   font-family: 'Playfair Display', Georgia, serif !important;
-  font-size: 1.12rem;
+  font-size: 1.02rem;
   font-weight: 600;
   color: #FFFFFF;
 }
 
-.footer-about {
-  font-family: 'Inter', system-ui, sans-serif !important;
-  font-size: 0.8rem;
-  line-height: 1.75;
-  color: #7c89a4;
-  margin: 0;
-  max-width: 330px;
-}
-
 .footer-col-title {
   font-family: 'Inter', system-ui, sans-serif !important;
-  font-size: 0.68rem;
+  font-size: 0.62rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.5px;
   color: #C9A96E;
-  margin: 0 0 5px;
+  margin: 0 0 3px;
 }
 
 .footer-link {
   font-family: 'Inter', system-ui, sans-serif !important;
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   color: #9aa6bd;
   text-decoration: none;
   width: fit-content;
@@ -3295,16 +3304,16 @@ body {
 
 .footer-info {
   font-family: 'Inter', system-ui, sans-serif !important;
-  font-size: 0.8rem;
+  font-size: 0.74rem;
   color: #7c89a4;
-  line-height: 1.5;
+  line-height: 1.45;
 }
 
 .footer-bottom {
   border-top: 1px solid rgba(255,255,255,0.06);
   max-width: 1200px;
   margin: 0 auto;
-  padding: 17px 48px;
+  padding: 8px 48px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -3314,34 +3323,36 @@ body {
 
 .footer-copy {
   font-family: 'Inter', system-ui, sans-serif !important;
-  font-size: 0.74rem;
+  font-size: 0.7rem;
   color: #5a6b8c;
   letter-spacing: 0.2px;
 }
 
 .footer-dev {
   font-family: 'Inter', system-ui, sans-serif !important;
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   color: #7c89a4;
 }
 
 .footer-dev strong {
   font-family: 'Playfair Display', Georgia, serif !important;
   font-weight: 600;
-  font-size: 0.86rem;
+  font-size: 0.82rem;
   color: rgba(255,255,255,0.88);
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
+  body { padding-bottom: 280px; }
   .footer-main {
     grid-template-columns: 1fr 1fr;
-    gap: 32px;
-    padding: 36px 28px 24px;
+    gap: 18px;
+    padding: 14px 24px 8px;
   }
   .footer-bottom {
     flex-direction: column;
     text-align: center;
-    padding: 16px 28px;
+    padding: 8px 24px;
+    gap: 4px;
   }
 }
 
@@ -3946,17 +3957,17 @@ body {
 
 .ui-growl-item-container {
   border-radius: 12px !important;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.40) !important;
-  border: 1px solid rgba(255,255,255,0.08) !important;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.35) !important;
+  border: 1px solid rgba(255,255,255,0.15) !important;
   overflow: hidden;
   margin-bottom: 12px;
+  background: #1B2333 !important;
 }
 
 .ui-growl-item {
   padding: 6px 6px 6px 0 !important;
   border-radius: 12px !important;
-  background: rgba(25,33,48,0.95) !important;
-  backdrop-filter: blur(14px) !important;
+  background: #1B2333 !important;
   border: 1px solid rgba(255,255,255,0.10) !important;
 }
 

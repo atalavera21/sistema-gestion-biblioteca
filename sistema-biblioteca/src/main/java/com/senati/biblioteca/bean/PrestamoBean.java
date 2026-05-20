@@ -73,9 +73,12 @@ public class PrestamoBean implements Serializable {
         String codigo = getCodigoSesion();
         if (codigo == null) return "login?faces-redirect=true";
         try {
-            prestamoService.registrarPrestamo(codigo, libroId);
+            Prestamo creado = prestamoService.registrarPrestamo(codigo, libroId);
+            long diffMs = creado.getFechaDevolucionEstimada().getTime() - creado.getFechaPrestamo().getTime();
+            int dias = (int) Math.round(diffMs / (1000d * 60 * 60 * 24));
+            String unidad = dias == 1 ? "día" : "días";
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage("Prestamo registrado. Tienes 14 dias para devolverlo."));
+                new FacesMessage("Préstamo registrado. Tienes " + dias + " " + unidad + " para devolverlo."));
             cargarPrestamosActivos();
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null,

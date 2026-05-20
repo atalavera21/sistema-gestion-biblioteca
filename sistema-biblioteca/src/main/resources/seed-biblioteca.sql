@@ -43,6 +43,7 @@ INSERT INTO `libros` (`id`, `autor`, `isbn`, `stockTotal`, `titulo`, `categoria_
 UNLOCK TABLES;
 
 UPDATE `libros` SET `activo` = 1;
+UPDATE `libros` SET `dias_prestamo` = 14 WHERE `dias_prestamo` IS NULL OR `dias_prestamo` = 0;
 
 --
 -- Dumping data for table `usuarios`

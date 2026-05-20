@@ -58,7 +58,8 @@ public class PrestamoService {
         prestamo.setLibro(libro);
         prestamo.setUsuario(usuario);
         prestamo.setFechaPrestamo(new Date());
-        prestamo.setFechaDevolucionEstimada(sumarDias(new Date(), libro.getDiasPrestamo()));
+        int diasPrestamo = libro.getDiasPrestamo() > 0 ? libro.getDiasPrestamo() : 14;
+        prestamo.setFechaDevolucionEstimada(sumarDias(new Date(), diasPrestamo));
         prestamo.setEstado(EstadoPrestamo.ACTIVO);
 
         return prestamoDAO.save(prestamo);

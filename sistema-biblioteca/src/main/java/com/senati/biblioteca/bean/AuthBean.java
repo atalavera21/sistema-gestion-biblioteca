@@ -1,5 +1,7 @@
 package com.senati.biblioteca.bean;
 
+import com.senati.biblioteca.dao.UsuarioDAO;
+import com.senati.biblioteca.modelo.Usuario;
 import com.senati.biblioteca.servicio.AuthService;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.application.FacesMessage;
@@ -8,6 +10,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.servlet.http.HttpSession;
 import java.io.Serializable;
+import java.util.Optional;
 
 @Named
 @SessionScoped
@@ -18,6 +21,9 @@ public class AuthBean implements Serializable {
 
     @Inject
     private NotificacionBean notificacionBean;
+
+    @Inject
+    private UsuarioDAO usuarioDAO;
 
     private String username;
     private String password;
@@ -40,6 +46,9 @@ public class AuthBean implements Serializable {
 
             String rol = authService.obtenerRol(usuarioSinDominio);
             session.setAttribute("rol", rol);
+
+            Optional<Usuario> usuario = usuarioDAO.findByCodigoUniversitario(usuarioSinDominio);
+            usuario.ifPresent(u -> session.setAttribute("nombre", u.getNombre()));
 
             if ("ESTUDIANTE".equals(rol)) {
                 notificacionBean.cargarNotificaciones();
@@ -80,6 +89,12 @@ public class AuthBean implements Serializable {
         HttpSession session = (HttpSession) FacesContext.getCurrentInstance()
             .getExternalContext().getSession(false);
         return session != null ? (String) session.getAttribute("rol") : null;
+    }
+
+    public String getNombre() {
+        HttpSession session = (HttpSession) FacesContext.getCurrentInstance()
+            .getExternalContext().getSession(false);
+        return session != null ? (String) session.getAttribute("nombre") : null;
     }
 
     public String getUsername() { return username; }

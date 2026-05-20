@@ -23,10 +23,7 @@
                     <h:graphicImage library="images" name="Senati-Logo.png"
                                     alt="SENATI" styleClass="navbar-logo-img"/>
                 </span>
-                <span class="navbar-name">
-                    <span class="navbar-name-main">Biblioteca SENATI</span>
-                    <span class="navbar-name-sub">Sistema Bibliotecario</span>
-                </span>
+                <span class="navbar-brand-text">Biblioteca</span>
             </a>
 
             <div class="navbar-links">
@@ -68,9 +65,12 @@
                 <h:panelGroup rendered="#{authBean.autenticado}">
                     <div class="navbar-user">
                         <div class="navbar-avatar">
-                            #{authBean.codigo.substring(0,2).toUpperCase()}
+                            #{(empty authBean.nombre ? authBean.codigo : authBean.nombre).substring(0,1).toUpperCase()}
                         </div>
-                        <span class="navbar-username">#{authBean.codigo}</span>
+                        <div class="navbar-user-info">
+                            <span class="navbar-user-name">#{empty authBean.nombre ? authBean.codigo : authBean.nombre}</span>
+                            <span class="navbar-user-code">#{authBean.codigo}</span>
+                        </div>
                         <h:form style="display:contents;">
                             <p:commandButton styleClass="navbar-logout" value="Salir"
                                              icon="pi pi-sign-out" ajax="false"
@@ -194,29 +194,21 @@
                     </span>
                     <span class="footer-brand-name">Biblioteca SENATI</span>
                 </div>
-                <p class="footer-about">
-                    Plataforma de gestión bibliotecaria para la consulta del catálogo,
-                    el préstamo de ejemplares y el seguimiento de devoluciones de la
-                    comunidad SENATI.
-                </p>
             </div>
             <div class="footer-col">
                 <h4 class="footer-col-title">Navegación</h4>
                 <a href="#{request.contextPath}/catalogo.xhtml" class="footer-link">Catálogo</a>
                 <a href="#{request.contextPath}/prestamos.xhtml" class="footer-link">Mis Préstamos</a>
-                <a href="#{request.contextPath}/index.xhtml" class="footer-link">Inicio</a>
             </div>
             <div class="footer-col">
                 <h4 class="footer-col-title">Atención</h4>
-                <span class="footer-info">Lunes a Viernes</span>
-                <span class="footer-info">08:00 — 20:00 h</span>
-                <span class="footer-info">Sábados · 09:00 — 13:00 h</span>
+                <span class="footer-info">Lun. a Vie. · 08:00 — 20:00 h</span>
+                <span class="footer-info">Sáb. · 09:00 — 13:00 h</span>
             </div>
             <div class="footer-col">
                 <h4 class="footer-col-title">Contacto</h4>
                 <span class="footer-info">biblioteca@senati.pe</span>
                 <span class="footer-info">(01) 208-9999</span>
-                <span class="footer-info">Av. Alfredo Mendiola 3520, Lima</span>
             </div>
         </div>
         <div class="footer-bottom">
