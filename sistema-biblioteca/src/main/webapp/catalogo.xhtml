@@ -249,7 +249,7 @@
                     <p style="margin:0;">Al solicitar este préstamo aceptas las siguientes condiciones:</p>
                 </div>
                 <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:16px; margin-bottom:20px; text-align:left; font-family:Inter,sans-serif; font-size:0.8rem; color:#8a94a8; line-height:1.7;">
-                    <p style="margin:0 0 8px 0;">&#8226; El préstamo tiene una duración de <strong style="color:#e8edf5;">14 días</strong>.</p>
+                    <p style="margin:0 0 8px 0;">&#8226; El préstamo tiene una duración de <strong style="color:#e8edf5;">#{prestamoBean.libroParaSolicitar.diasPrestamo gt 0 ? prestamoBean.libroParaSolicitar.diasPrestamo : 14} #{prestamoBean.libroParaSolicitar.diasPrestamo eq 1 ? 'día' : 'días'}</strong>.</p>
                     <p style="margin:0 0 8px 0;">&#8226; Debes devolver el libro en buen estado.</p>
                     <p style="margin:0 0 8px 0;">&#8226; La devolución tardía genera <strong style="color:#f87171;">penalización</strong>.</p>
                     <p style="margin:0;">&#8226; Máximo <strong style="color:#e8edf5;">3 préstamos activos</strong> simultáneos.</p>
