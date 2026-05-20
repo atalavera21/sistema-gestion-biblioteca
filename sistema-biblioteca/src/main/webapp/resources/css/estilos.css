@@ -89,11 +89,11 @@ body {
   color: #e8edf5 !important;
   background: linear-gradient(160deg, #131923 0%, #0D1520 50%, #101824 100%) fixed !important;
   min-height: 100vh;
-  padding-bottom: 168px;
+  padding-bottom: 44px;
 }
 
 .page-content {
-  min-height: calc(100vh - 64px - 168px);
+  min-height: calc(100vh - 64px - 44px);
 }
 
 /* ============================================================
@@ -3209,17 +3209,19 @@ body {
 }
 
 /* ============================================================
-     16. FOOTER (compacto, fijo al pie de la ventana)
+     16. FOOTER (minimalista, fijo al pie de la ventana)
    ============================================================ */
 .footer {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(10,14,22,0.98);
+  background: rgba(10,14,22,0.92);
   backdrop-filter: blur(10px);
-  border-top: 1px solid rgba(255,255,255,0.07);
+  border-top: 1px solid rgba(255,255,255,0.06);
   z-index: 50;
+  padding: 11px 24px;
+  text-align: center;
 }
 
 .footer::before {
@@ -3229,131 +3231,35 @@ body {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent 0%, rgba(201,169,110,0.40) 35%, rgba(59,130,246,0.40) 65%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(201,169,110,0.55) 50%, transparent 100%);
 }
 
-.footer-main {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 14px 48px 10px;
-  display: grid;
-  grid-template-columns: 1.4fr 1fr 1.3fr 1.3fr;
-  gap: 32px;
-}
-
-.footer-col {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.footer-brand-row {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-}
-
-.footer-logo {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: #FFFFFF;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.footer-logo-img {
-  width: 25px;
-  height: 25px;
-  object-fit: cover;
-  display: block;
-}
-
-.footer-brand-name {
-  font-family: 'Playfair Display', Georgia, serif !important;
-  font-size: 1.02rem;
-  font-weight: 600;
-  color: #FFFFFF;
-}
-
-.footer-col-title {
-  font-family: 'Inter', system-ui, sans-serif !important;
-  font-size: 0.62rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: #C9A96E;
-  margin: 0 0 3px;
-}
-
-.footer-link {
+.footer-line {
   font-family: 'Inter', system-ui, sans-serif !important;
   font-size: 0.76rem;
-  color: #9aa6bd;
-  text-decoration: none;
-  width: fit-content;
-  transition: color 150ms ease;
-}
-
-.footer-link:hover {
-  color: #FFFFFF;
-}
-
-.footer-info {
-  font-family: 'Inter', system-ui, sans-serif !important;
-  font-size: 0.74rem;
+  font-weight: 400;
   color: #7c89a4;
-  line-height: 1.45;
-}
-
-.footer-bottom {
-  border-top: 1px solid rgba(255,255,255,0.06);
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 8px 48px;
-  display: flex;
+  letter-spacing: 0.6px;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
   gap: 14px;
-  flex-wrap: wrap;
 }
 
-.footer-copy {
-  font-family: 'Inter', system-ui, sans-serif !important;
-  font-size: 0.7rem;
-  color: #5a6b8c;
-  letter-spacing: 0.2px;
-}
-
-.footer-dev {
-  font-family: 'Inter', system-ui, sans-serif !important;
-  font-size: 0.72rem;
-  color: #7c89a4;
-}
-
-.footer-dev strong {
+.footer-line strong {
   font-family: 'Playfair Display', Georgia, serif !important;
   font-weight: 600;
-  font-size: 0.82rem;
-  color: rgba(255,255,255,0.88);
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.94);
+  letter-spacing: 0.3px;
 }
 
-@media (max-width: 900px) {
-  body { padding-bottom: 280px; }
-  .footer-main {
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
-    padding: 14px 24px 8px;
-  }
-  .footer-bottom {
-    flex-direction: column;
-    text-align: center;
-    padding: 8px 24px;
-    gap: 4px;
-  }
+.footer-dot {
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #C9A96E;
+  opacity: 0.6;
 }
 
 .card-footer-admin {
